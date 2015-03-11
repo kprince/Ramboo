@@ -3,6 +3,9 @@ package com.xiaoming.random.utils;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.v4.widget.SwipeRefreshLayout;
+
+import com.xiaoming.random.R;
 
 public class Utils {
     public static boolean detect(Context context) {
@@ -19,6 +22,22 @@ public class Utils {
         }
 
         return true;
+    }
+
+    /**
+     * 下拉刷新颜色
+     * @param swipeLayout
+     */
+    public static void setSwipeRefreshColorSchema(SwipeRefreshLayout swipeLayout){
+        swipeLayout.setColorSchemeResources(
+                R.color.red_a400,
+                R.color.green_a400,
+                R.color.light_blue_a400,
+                R.color.pink_a400,
+                R.color.teal_a400,
+                R.color.purple_a400,
+                R.color.indigo_a400
+        );
     }
 
     /**

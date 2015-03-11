@@ -186,26 +186,47 @@ public class AppMainActivity extends BaseActivity {
                 switch (position) {
                     case HOME_INDEX:
                         holder.drawerItemImage.setImageResource(R.drawable.ic_home_white_36dp);
-                        holder.drawerItemImage.setColorFilter(getColor(R.attr.colorPrimary), PorterDuff.Mode.MULTIPLY);
-                        holder.drawerItemName.setTextColor(getColor(R.attr.colorPrimary));
+                        if (mMenuPosition-1==HOME_INDEX) {
+                            change2Selected(holder);
+                        }
                         break;
                     case COMMENTS_INDEX:
                         holder.drawerItemImage.setImageResource(R.drawable.ic_email_white_36dp);
+                        if (mMenuPosition-1==COMMENTS_INDEX) {
+                            change2Selected(holder);
+                        }
                         break;
                     case FRIENDS_INDEX:
                         holder.drawerItemImage.setImageResource(R.drawable.ic_group_white_36dp);
+                        if (mMenuPosition-1==FRIENDS_INDEX) {
+                            change2Selected(holder);
+                        }
                         break;
                     case PROFILE_INDEX:
                         holder.drawerItemImage.setImageResource(R.drawable.ic_account_circle_white_36dp);
+                        if (mMenuPosition-1==PROFILE_INDEX) {
+                            change2Selected(holder);
+                        }
                         break;
                     case LOGOUT_INDEX:
                         holder.drawerItemImage.setImageResource(R.drawable.ic_exit_to_app_white_36dp);
+                        if (mMenuPosition-1==LOGOUT_INDEX) {
+                            change2Selected(holder);
+                        }
                         break;
                     case SETTINGS_INDEX:
                         holder.drawerItemImage.setImageResource(R.drawable.ic_settings_white_36dp);
+                        if (mMenuPosition-1==SETTINGS_INDEX) {
+                            change2Selected(holder);
+                        }
                         break;
                 }
                 return convertView;
+            }
+
+            private void change2Selected(ViewHolder holder) {
+                holder.drawerItemImage.setColorFilter(getColor(R.attr.colorPrimary), PorterDuff.Mode.MULTIPLY);
+                holder.drawerItemName.setTextColor(getColor(R.attr.colorPrimary));
             }
 
             @Override

@@ -31,6 +31,7 @@ import com.xiaoming.random.listener.PauseOnScrollListener;
 import com.xiaoming.random.model.AuthUser;
 import com.xiaoming.random.tasks.AsyncSave2DBTask;
 import com.xiaoming.random.utils.OauthUtils;
+import com.xiaoming.random.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -121,11 +122,8 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
         mCommentsView.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), true));
         swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh);
         swipeLayout.setOnRefreshListener(this);
-        swipeLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
-        setRefreshing(swipeLayout, true);
+        Utils.setSwipeRefreshColorSchema(swipeLayout);
+        swipeLayout.setRefreshing(true);
         getCachedUsers();
         mSendBtn = (ButtonFloat) rootView.findViewById(R.id.back_to_top);
         mSendBtn.setBackgroundColor(getColor(R.attr.colorAccent));
@@ -234,6 +232,9 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
 
         @Override
         public void onWeiboException(WeiboException e) {
+            if (swipeLayout != null) {
+                swipeLayout.setRefreshing(false);
+            }
             LogUtil.e(TAG, e.getMessage());
             ErrorInfo info = ErrorInfo.parse(e.getMessage());
             Toast.makeText(getActivity(), info.error==null?getString(R.string.networkUnavailable):info.toString(),

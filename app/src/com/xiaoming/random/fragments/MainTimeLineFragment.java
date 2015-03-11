@@ -37,6 +37,7 @@ import com.xiaoming.random.model.AuthUser;
 import com.xiaoming.random.tasks.AsyncSave2DBTask;
 import com.xiaoming.random.utils.OauthUtils;
 import com.xiaoming.random.utils.StatusViewHolder;
+import com.xiaoming.random.utils.Utils;
 import com.xiaoming.random.widgets.RandomButtonFloat;
 
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class MainTimeLineFragment extends BaseFragment implements
     private static final int STATUS_DEFAULT_LENGTH = 50;
     protected final String TAG = "MainTimeLineFragment";
     private int mTabPosition;
-    private long mMaxId = 0;
+//    private long mMaxId = 0;
     private long mSinceId = 0;
     private long mUid;
     private Oauth2AccessToken mAccessToken;
@@ -126,7 +127,7 @@ public class MainTimeLineFragment extends BaseFragment implements
             mScreenName = bundle.getString(SCREEN_NAME, "");
             mSinceId = 0l;
         }
-        mMaxId = 0;
+//        mMaxId = 0;
         mStatusDao = new StatusDao(getActivity());
         initStatusType();
     }
@@ -138,22 +139,15 @@ public class MainTimeLineFragment extends BaseFragment implements
                 container, false);
         swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh);
         swipeLayout.setOnRefreshListener(this);
-        swipeLayout.setColorSchemeResources(
-                R.color.red_a400,
-                R.color.green_a400,
-                R.color.light_blue_a400,
-                R.color.pink_a400,
-                R.color.teal_a400, R.color.purple_a400,
-                R.color.indigo_a400
-        );
-        setRefreshing(swipeLayout, true);
+        Utils.setSwipeRefreshColorSchema(swipeLayout);
+        swipeLayout.setRefreshing(true);
         mStatusListView = (RecyclerView) rootView.findViewById(R.id.main_time_line);
-//      ImageLoader滑动停止加载图片
-//		mStatusListView.setOnScrollListener(new PauseOnScrollListener(imageLoader, true, true));
+
         mLayoutManager = new LinearLayoutManager(getActivity());
         mStatusListView.setLayoutManager(mLayoutManager);
         mStatusAdapter = new StatusAdapter();
         mStatusListView.setAdapter(mStatusAdapter);
+        //      ImageLoader滑动停止加载图片
         mStatusListView.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), true));
         getCachedStatus();
         mBack2Top = (RandomButtonFloat) rootView.findViewById(R.id.back_to_top);
@@ -182,13 +176,6 @@ public class MainTimeLineFragment extends BaseFragment implements
      * 获取缓存的微博列表
      */
     public void getCachedStatus() {
-        //授权后第一次进入，不进行第二个TAB的预加载
-//        if (mTabPosition==1&&getUserPref().getBoolean(BaseActivity.SF_JUST_AUTH,false)){
-//            SharedPreferences.Editor editor = getUserPref().edit();
-//            editor.putBoolean(BaseActivity.SF_JUST_AUTH,false);
-//            editor.commit();
-//            return;
-//        };
         mSinceId = mStatusDao.getSinceId(STATUS, mType);
         mStatusList = mStatusDao.readStatus(STATUS_DEFAULT_LENGTH, mType);
         if (mStatusList == null || mStatusList.size() <= 0) {
@@ -232,7 +219,7 @@ public class MainTimeLineFragment extends BaseFragment implements
         }
         // 用户界面微博
         else if (!TextUtils.isEmpty(mScreenName)) {
-            mType = STATUS_USER;
+            mType = STATUS_BY_ME;
         } else {
             switch (mTabPosition) {
                 // 首页
@@ -272,7 +259,6 @@ public class MainTimeLineFragment extends BaseFragment implements
             // @我的微博
             if (mAtFlag != 0) {
                 mType = STATUS_AT_ME;
-                mSinceId = mStatusDao.getSinceId(STATUS, mType);
                 mStatusesAPI = new StatusesAPI(mAccessToken);
                 mStatusesAPI.mentions(0, 0, 100, 1,
                         StatusesAPI.AUTHOR_FILTER_ALL,
@@ -281,27 +267,26 @@ public class MainTimeLineFragment extends BaseFragment implements
             }
             // 用户界面微博
             else if (!TextUtils.isEmpty(mScreenName)) {
+                mType = STATUS_BY_ME;
                 mStatusesAPI = new StatusesAPI(mAccessToken);
-
-                mStatusesAPI.userTimeline(mScreenName, 0, 0, 50, 1, false,
+                mStatusesAPI.userTimeline(mScreenName, mSinceId, 0, 50, 1, false,
                         StatusesAPI.FEATURE_ALL, false, requestListener);
             } else {
                 switch (mTabPosition) {
                     // 首页
                     case 0:
                         mType = STATUS_HOME;
-                        mSinceId = mStatusDao.getSinceId(STATUS, mType);
                         mStatusesAPI = new StatusesAPI(mAccessToken);
-                        mStatusesAPI.friendsTimeline(mSinceId, mMaxId, 50, 1,
+                        mStatusesAPI.friendsTimeline(mSinceId, 0, 50, 1,
                                 false, StatusesAPI.FEATURE_ALL, false,
                                 requestListener);
                         break;
                     // 互相关注
                     case 1:
                         mType = STATUS_EACH_OTHER;
-                        mSinceId = mStatusDao.getSinceId(STATUS, mType);
+
                         mStatusesAPI = new StatusesAPI(mAccessToken);
-                        mStatusesAPI.bilateralTimeline(0, 0, 50, 1, false,
+                        mStatusesAPI.bilateralTimeline(mSinceId, 0, 50, 1, false,
                                 StatusesAPI.FEATURE_ALL, true,
                                 requestListener);
                         break;
@@ -309,23 +294,20 @@ public class MainTimeLineFragment extends BaseFragment implements
                     case 2:
                         mType = STATUS_BY_ME;
                         mUid = getUserID();
-                        mSinceId = mStatusDao.getSinceId(STATUS, mType);
                         mStatusesAPI = new StatusesAPI(mAccessToken);
-                        mStatusesAPI.userTimeline(mUid, 0, mMaxId, 50,
+                        mStatusesAPI.userTimeline(mUid, mSinceId, 0, 50,
                                 1, false, StatusesAPI.FEATURE_ALL, false,
                                 requestListener);
                         break;
                     // 收藏
                     case 3:
                         mType = STATUS_FAVORITES;
-                        mSinceId = mStatusDao.getSinceId(STATUS, mType);
                         mFavoriteAPI = new FavoritesAPI(mAccessToken);
                         mFavoriteAPI.favorites(50, 1, requestListener);
                         break;
                     // 附近微博
                     case 4:
                         mType = STATUS_NEARBY;
-                        mSinceId = mStatusDao.getSinceId(STATUS, mType);
                         mPlaceAPI = new PlaceAPI(mAccessToken);
                         getLocationDegrees();
                         long now = System.currentTimeMillis();
@@ -338,9 +320,8 @@ public class MainTimeLineFragment extends BaseFragment implements
                         break;
                     default:
                         mType = STATUS_HOME;
-                        mSinceId = mStatusDao.getSinceId(STATUS, mType);
                         mStatusesAPI = new StatusesAPI(mAccessToken);
-                        mStatusesAPI.friendsTimeline(mSinceId, mMaxId, 50, 1,
+                        mStatusesAPI.friendsTimeline(mSinceId, 0, 50, 1,
                                 false, StatusesAPI.FEATURE_ALL, false,
                                 requestListener);
                         break;
@@ -441,6 +422,10 @@ public class MainTimeLineFragment extends BaseFragment implements
 
         @Override
         public void onWeiboException(WeiboException e) {
+            //加载失败关闭swipeRefreshLayout
+            if (swipeLayout != null) {
+                swipeLayout.setRefreshing(false);
+            }
             LogUtil.e(TAG, e.getMessage());
             ErrorInfo info = ErrorInfo.parse(e.getMessage());
             Toast.makeText(getActivity(), info.error == null ?
@@ -472,8 +457,8 @@ public class MainTimeLineFragment extends BaseFragment implements
 
                     }
                     if (mStatusList != null && mStatusList.size() > 0) {
-                        mMaxId = Long.parseLong(mStatusList.get(mStatusList
-                                .size() - 1).id);
+//                        mMaxId = Long.parseLong(mStatusList.get(mStatusList
+//                                .size() - 1).id);
                         mSinceId = Long.parseLong(mStatusList.get(0).id);
                     }
                     mStatusAdapter.notifyDataSetChanged();
@@ -493,8 +478,8 @@ public class MainTimeLineFragment extends BaseFragment implements
                         }
                     }
                     if (mStatusList != null && mStatusList.size() > 0) {
-                        mMaxId = Long.parseLong(mStatusList.get(mStatusList
-                                .size() - 1).id);
+//                        mMaxId = Long.parseLong(mStatusList.get(mStatusList
+//                                .size() - 1).id);
                         mSinceId = Long.parseLong(mStatusList.get(0).id);
                     }
                     mStatusAdapter.notifyDataSetChanged();

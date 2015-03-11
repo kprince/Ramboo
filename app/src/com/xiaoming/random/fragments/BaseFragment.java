@@ -98,8 +98,6 @@ public class BaseFragment extends Fragment {
         }, 400);
     }
 
-    ;
-
 
     /**
      * 获取Material Design 的颜色
