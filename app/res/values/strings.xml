@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Ramboo</string>
+    <!-- drawer container -->
+    <string name="home">首页</string>
+    <string name="profile">个人资料</string>
+    <string name="detail">正文</string>
+    <string name="logout">注销</string>
+    <string name="weibo"> 微博</string>
+    <string name="weiboDetail">微博详情</string>
+    <string name="networkUnavailable">网络不给力</string>
+    <string name="sendWeibo">发微博</string>
+    <string name="title_activity_send_weibo">发微博</string>
+    <string name="repostWeibo">转发微博</string>
+    <string name="follow">加  关  注</string>
+    <string name="followed">关注</string>
+    <string name="followMe">粉丝</string>
+    <string name="open">打开</string>
+    <string name="oauth_page">微博授权</string>
+    <string name="sendComment">写评论</string>
+    <string name="favorites">收藏</string>
+    <string name="cancelFavor">取消收藏</string>
+    <string name="exportSucceed">导出成功</string>
+    <string name="exportFailed">导出失败</string>
+    <string name="repost"> 转发</string>
+    <string name="comment"> 评论</string>
+
+    <!-- userProfile -->
+    <string name="notAuthUser">Sorry，由于新浪微博接口限制，无法获取未授权本应用用户的微博列表</string>
+    <string name="cancelFollow">取消关注</string>
+    <string name="operationSucceed">操作成功</string>
+    <string name="operationFailed">操作失败：</string>
+    <string name="sexNA">未知  </string>
+    <string name="female">女  </string>
+    <string name="male">男  </string>
+    <string name="createAt">创建于   </string>
+    <string name="authExpired">授权已过期，请重新授权</string>
+    <!-- settings -->
+    <string name="weiboCacheSpace">缓存的微博、评论等  共</string>
+    <string name="weiboCleared">微博缓存清理完毕</string>
+    <string name="imageCacheSpace">缓存的图片  共</string>
+    <string name="imageCleared">图片缓存清理完毕</string>
+    <string name="exportedCardSpace">导出的微博卡片  共</string>
+    <string name="expCardsCleared">微博卡片清理完毕</string>
+    <!-- comments -->
+    <string name="noRecentComments">无最新评论</string>
+    <!-- accounts -->
+    <string name="authFailed">授权失败：</string>
+    <string name="authSucceed">授权成功</string>
+    <string name="cancelAuth">你取消了认证</string>
+    <string name="pressAgain">再按一次退出</string>
+    <string name="accounts">账户列表</string>
+    <!-- AppMainActivity -->
+    <string name="userDetail">用户详情</string>
+    <string name="logout2Account">注销当前用户？</string>
+    <string name="confirmLogout">点击确定退出登录</string>
+    <string name="accept">确定</string>
+    <string name="cancel">取消</string>
+    <string name="firstTime">首次使用，请授权！</string>
+    <string name="settings">设置</string>
+    <!-- -->
+    <string name="contentNull">微博内容不能为空</string>
+    <string name="comments">评论</string>
+    <string name="status">微博</string>
+    <string name="sendSucceed">发送成功</string>
+    <string name="sendFailed">发送失败：</string>
+    <string name="smartAtNotAvailable">努力开发中:)</string>
+    <string name="loadFailed">加载失败：</string>
+    <string name="saveEmotionFailed">保存表情失败：</string>
+    <!--Random theme-->
+    <string name="theme_red">Red</string>
+    <string name="theme_pink">Pink</string>
+    <string name="theme_teal">Teal</string>
+    <string name="theme_lime">Lime</string>
+    <string name="theme_light_green">Light Green</string>
+    <string name="theme_purple">Purple</string>
+    <string name="theme_deep_purple">Deep Purple</string>
+    <string name="theme_light_blue">Light Blue</string>
+    <string name="theme_yellow">Yellow</string>
+    <string name="theme_blue">Blue</string>
+    <string name="theme_amber">Amber</string>
+
+</resources>

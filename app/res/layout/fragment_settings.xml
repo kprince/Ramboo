@@ -1,0 +1,287 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/RandomSettingHeaderText"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="left|center"
+            android:text="颜色切换" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/grey_400" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal">
+
+            <com.gc.materialdesign.views.ButtonRectangle
+                android:id="@+id/color_btn_one"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_margin="0dp"
+                android:layout_weight="1"
+                android:background="@color/red_500"
+                android:text="@string/theme_red" />
+
+            <com.gc.materialdesign.views.ButtonRectangle
+                android:id="@+id/color_btn_two"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_margin="0dp"
+                android:layout_weight="1"
+                android:background="@color/teal_500"
+                android:text="@string/theme_teal"
+
+                />
+
+            <com.gc.materialdesign.views.ButtonRectangle
+                android:id="@+id/color_btn_three"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_margin="0dp"
+                android:layout_weight="1"
+                android:background="@color/light_blue_500"
+                android:text="@string/theme_light_blue" />
+
+            <com.gc.materialdesign.views.ButtonRectangle
+                android:id="@+id/color_btn_four"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_margin="0dp"
+                android:layout_weight="1"
+                android:background="@color/purple_500"
+                android:text="@string/theme_purple" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:orientation="horizontal">
+
+            <com.gc.materialdesign.views.ButtonRectangle
+                android:id="@+id/color_btn_five"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_margin="0dp"
+                android:layout_weight="1"
+                android:background="@color/pink_500"
+                android:text="@string/theme_pink" />
+
+            <com.gc.materialdesign.views.ButtonRectangle
+                android:id="@+id/color_btn_six"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_margin="0dp"
+                android:layout_weight="1"
+                android:background="@color/light_green_500"
+                android:text="@string/theme_light_green"
+
+                />
+
+            <com.gc.materialdesign.views.ButtonRectangle
+                android:id="@+id/color_btn_seven"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_margin="0dp"
+                android:layout_weight="1"
+                android:background="@color/blue_500"
+                android:text="@string/theme_blue" />
+
+            <com.gc.materialdesign.views.ButtonRectangle
+                android:id="@+id/color_btn_eight"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_margin="0dp"
+                android:layout_weight="1"
+                android:background="@color/amber_500"
+                android:text="@string/theme_amber" />
+
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/grey_400" />
+
+        <TextView
+            style="@style/RandomSettingHeaderText"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="left|center"
+            android:text="流量控制" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/grey_400" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingLeft="16dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="4"
+                android:alpha="0.87"
+                android:gravity="left|center"
+                android:text="非WIFI环境下载图片"
+                android:textColor="@android:color/black"
+                android:textStyle="bold" />
+            <!--<com.gc.materialdesign.views.Switch-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--md:check="true">-->
+            <!--</com.gc.materialdesign.views.Switch>-->
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/grey_400" />
+
+        <TextView
+            style="@style/RandomSettingHeaderText"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="left|center"
+            android:text="缓存清理" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/grey_400" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="5dp">
+
+            <TextView
+                android:id="@+id/cachedImgText"
+                style="@style/RandomSettingItemTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="缓存的图片" />
+
+            <TextView
+                android:id="@+id/cachedImgPath"
+                style="@style/RandomSettingItemSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/cachedImgText" />
+
+            <ImageView
+                android:id="@+id/cachedImgDel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_delete_white_36dp" />
+
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/grey_300" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="5dp">
+
+            <TextView
+                android:id="@+id/cachedContent"
+                style="@style/RandomSettingItemTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="缓存的微博、评论等" />
+
+            <TextView
+                android:id="@+id/cachedCPath"
+                style="@style/RandomSettingItemSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/cachedContent" />
+
+            <ImageView
+                android:id="@+id/cachedContentDel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_delete_white_36dp" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/grey_300" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="5dp">
+
+            <TextView
+                android:id="@+id/exported_card_content"
+                style="@style/RandomSettingItemTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="导出的微博卡片" />
+
+            <TextView
+                android:id="@+id/exported_card_path"
+                style="@style/RandomSettingItemSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/exported_card_content" />
+
+            <ImageView
+                android:id="@+id/exported_card_img"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_delete_white_36dp" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:background="@color/grey_400" />
+    </LinearLayout>
+</ScrollView>

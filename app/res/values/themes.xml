@@ -1,0 +1,92 @@
+<resources>
+    <!-- theme Teal -->
+    <style name="Theme.Random.teal" parent="Theme.AppCompat.Light.NoActionBar">
+        <!--  -->
+        <item name="colorPrimary">@color/teal_500</item>
+        <item name="colorPrimaryDark">@color/teal_700</item>
+        <item name="colorAccent">@color/pink_a200</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+    </style>
+
+
+    <!-- theme Red -->
+    <style name="Theme.Random.red" parent="Theme.AppCompat.Light.NoActionBar">
+
+        <!--  -->
+        <item name="colorPrimary">@color/red_500</item>
+        <item name="colorPrimaryDark">@color/red_700</item>
+        <item name="colorAccent">@color/teal_a200</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+    </style>
+
+    <!-- theme Pink -->
+    <style name="Theme.Random.pink" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/pink_500</item>
+        <item name="colorPrimaryDark">@color/pink_700</item>
+        <item name="colorAccent">@color/teal_a200</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+    </style>
+    <!-- theme Light Blue -->
+    <style name="Theme.Random.light_blue" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/light_blue_500</item>
+        <item name="colorPrimaryDark">@color/light_blue_700</item>
+        <item name="colorAccent">@color/pink_a200</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+    </style>
+    <!-- theme Purple -->
+    <style name="Theme.Random.purple" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryDark">@color/purple_700</item>
+        <item name="colorAccent">@color/green_a200</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+    </style>
+
+    <!-- theme Deep Purple -->
+    <style name="Theme.Random.deep_purple" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/deep_purple_500</item>
+        <item name="colorPrimaryDark">@color/deep_purple_700</item>
+        <item name="colorAccent">@color/green_a200</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+    </style>
+    <!-- theme Lime -->
+    <style name="Theme.Random.lime" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/lime_500</item>
+        <item name="colorPrimaryDark">@color/lime_700</item>
+        <item name="colorAccent">@color/green_a200</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+    </style>
+    <!-- theme Light Green -->
+    <style name="Theme.Random.light_green" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/light_green_500</item>
+        <item name="colorPrimaryDark">@color/light_green_700</item>
+        <item name="colorAccent">@color/pink_a200</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+    </style>
+
+    <!--Theme Yellow-->
+    <style name="Theme.Random.yellow" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/yellow_500</item>
+        <item name="colorPrimaryDark">@color/yellow_700</item>
+        <item name="colorAccent">@color/pink_a200</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+    </style>
+    <!--Theme Amber-->
+    <style name="Theme.Random.amber" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/amber_500</item>
+        <item name="colorPrimaryDark">@color/amber_700</item>
+        <item name="colorAccent">@color/pink_a200</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+    </style>
+    <!--Theme Blue-->
+    <style name="Theme.Random.blue" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/blue_500</item>
+        <item name="colorPrimaryDark">@color/blue_700</item>
+        <item name="colorAccent">@color/red_a700</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+    </style>
+
+
+    <style name="AppTheme" parent="AppBaseTheme">
+
+    </style>
+</resources>

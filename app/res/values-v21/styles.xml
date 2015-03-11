@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Random.teal" parent="Theme.AppCompat.Light.NoActionBar">
+
+        <!--  -->
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryDark">@color/color_primary_dark</item>
+        <item name="colorAccent">@color/color_primary_accent</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+    </style>
+</resources>

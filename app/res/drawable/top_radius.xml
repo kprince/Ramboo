@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--5.0以下系统会报错  <solid android:color="?attr/colorPrimary" />-->
+    <solid android:color="@color/grey_300" />
+    <corners
+        android:topLeftRadius="3dp"
+        android:topRightRadius="3dp" />
+</shape>

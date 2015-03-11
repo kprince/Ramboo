@@ -1,0 +1,113 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:materialdesign="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="0dp"
+    tools:context="com.xiaoming.random.activities.SendWeiboActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/sendWeiboToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <EditText
+            android:id="@+id/status_content"
+            android:layout_width="match_parent"
+            android:layout_height="230dp"
+            android:layout_marginBottom="0dp"
+            android:gravity="left"
+            android:hint="说点什么吧..."
+            android:maxLength="280"
+            android:textColor="@android:color/black" />
+
+        <com.gc.materialdesign.views.ButtonFloat
+            android:id="@+id/send_it"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="12dp"
+            android:layout_marginRight="12dp"
+            android:background="@color/pink_a200"
+            materialdesign:animate="false"
+            materialdesign:iconDrawable="@drawable/ic_send_white_36dp" />
+
+        <ImageView
+            android:id="@+id/send_weibo_image"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/status_content"
+            android:layout_margin="12dp"
+            android:src="@drawable/ic_account_circle_white_36dp"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/weiboBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/send_weibo_picture"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:id="@+id/send_weibo_camera"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:id="@+id/send_weibo_at_friends"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:id="@+id/send_weibo_emotions"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+
+                android:layout_weight="1" />
+        </LinearLayout>
+    </android.support.v7.widget.Toolbar>
+
+    <RelativeLayout
+        android:id="@+id/emotions_grid_layout"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:visibility="gone">
+
+        <GridView
+            android:id="@+id/emotions_grid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="2dp"
+            android:horizontalSpacing="3dp"
+            android:numColumns="10"
+            android:scrollbars="none"
+            android:verticalSpacing="3dp"></GridView>
+    </RelativeLayout>
+</LinearLayout>
