@@ -32,6 +32,7 @@ import com.xiaoming.random.tasks.AsyncSave2DBTask;
 import com.xiaoming.random.utils.OauthUtils;
 import com.xiaoming.random.utils.StatusUtils;
 import com.xiaoming.random.utils.TimeUtils;
+import com.xiaoming.random.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -187,15 +188,8 @@ public class CommentsFragment extends BaseFragment implements SwipeRefreshLayout
         mLayoutManager = new LinearLayoutManager(getActivity());
         mCommentsListView.setLayoutManager(mLayoutManager);
         swipeLayout.setOnRefreshListener(this);
-        swipeLayout.setColorSchemeResources(
-                R.color.red_a400,
-                R.color.green_a400,
-                R.color.light_blue_a400,
-                R.color.pink_a400,
-                R.color.teal_a400, R.color.purple_a400,
-                R.color.indigo_a400
-        );
-        setRefreshing(swipeLayout, true);
+        Utils.setSwipeRefreshColorSchema(swipeLayout);
+        swipeLayout.setRefreshing(true);
         getCachedComments();
         return rootView;
     }
@@ -251,6 +245,9 @@ public class CommentsFragment extends BaseFragment implements SwipeRefreshLayout
 
         @Override
         public void onWeiboException(WeiboException e) {
+            if (swipeLayout != null) {
+                swipeLayout.setRefreshing(false);
+            }
             LogUtil.e(TAG, e.getMessage());
             ErrorInfo info = ErrorInfo.parse(e.getMessage());
             OauthUtils.showToast(getActivity(), info.error == null ?

@@ -96,7 +96,7 @@ public class LineDetailActivity extends BaseActivity implements SwipeRefreshLayo
 
         setContentView(R.layout.status_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.time_line_detail_bar);
-        toolbar.setTitle("微博详情");
+        toolbar.setTitle(getString(R.string.weiboDetail));
         setSupportActionBar(toolbar);
 
         mRefresh = (SwipeRefreshLayout) findViewById(R.id.time_line_detail_refresh);
@@ -212,13 +212,13 @@ public class LineDetailActivity extends BaseActivity implements SwipeRefreshLayo
 
         @Override
         public void onComplete(String s) {
-            OauthUtils.showToast(LineDetailActivity.this, "操作成功");
+            OauthUtils.showToast(LineDetailActivity.this, getString(R.string.operationSucceed));
         }
 
         @Override
         public void onWeiboException(WeiboException e) {
             Log.e(TAG, e.getMessage());
-            OauthUtils.showToast(LineDetailActivity.this, "操作失败：" + e.getLocalizedMessage());
+            OauthUtils.showToast(LineDetailActivity.this, getString(R.string.operationFailed) + e.getLocalizedMessage());
         }
     }
 
