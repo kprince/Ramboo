@@ -80,8 +80,6 @@ public class TimeLineFragment extends Fragment {
 
             @Override
             public void onPageSelected(int position) {
-
-
             }
 
             @Override

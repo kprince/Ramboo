@@ -13,7 +13,6 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
-import com.nostra13.universalimageloader.core.listener.ImageLoadingProgressListener;
 import com.xiaoming.random.R;
 
 import java.util.ArrayList;
@@ -98,6 +97,12 @@ public class GalleryActivity extends BaseActivity {
             View view = mImageList.get(position);
             mImage = (ImageView) view.findViewById(R.id.image_view);
             mGif = (ImageView) view.findViewById(R.id.gif_imageview);
+            mImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    GalleryActivity.this.finish();
+                }
+            });
 //			if (mAttacher==null) {
 //			 mAttacher = new PhotoViewAttacher(mImage);
 //			}
@@ -120,7 +125,7 @@ public class GalleryActivity extends BaseActivity {
     }
 
     public class ImageLoadListener implements ImageLoadingListener {
-
+      //todo:图片下载时显示进度条
         @Override
         public void onLoadingCancelled(String arg0, View arg1) {
 
@@ -145,15 +150,6 @@ public class GalleryActivity extends BaseActivity {
 
     }
 
-    public class ImageLoadProgressListener implements ImageLoadingProgressListener {
-
-        @Override
-        public void onProgressUpdate(String arg0, View arg1, int arg2, int arg3) {
-            // TODO Auto-generated method stub
-
-        }
-
-    }
 
 //    public static ViewGroup.LayoutParams getLayoutParams(Bitmap bitmap, int screenWidth) {
 //

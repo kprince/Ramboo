@@ -140,16 +140,13 @@ public class MainTimeLineFragment extends BaseFragment implements
         swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh);
         swipeLayout.setOnRefreshListener(this);
         Utils.setSwipeRefreshColorSchema(swipeLayout);
-        swipeLayout.setRefreshing(true);
         mStatusListView = (RecyclerView) rootView.findViewById(R.id.main_time_line);
-
         mLayoutManager = new LinearLayoutManager(getActivity());
         mStatusListView.setLayoutManager(mLayoutManager);
         mStatusAdapter = new StatusAdapter();
         mStatusListView.setAdapter(mStatusAdapter);
         //      ImageLoader滑动停止加载图片
         mStatusListView.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), true));
-        getCachedStatus();
         mBack2Top = (RandomButtonFloat) rootView.findViewById(R.id.back_to_top);
         mBack2Top.setBackgroundColor(getColor(R.attr.colorAccent));
         mBack2Top.setOnClickListener(new View.OnClickListener() {
@@ -158,6 +155,7 @@ public class MainTimeLineFragment extends BaseFragment implements
                 mLayoutManager.scrollToPosition(0);
             }
         });
+        getCachedStatus();
         return rootView;
     }
 
@@ -176,6 +174,7 @@ public class MainTimeLineFragment extends BaseFragment implements
      * 获取缓存的微博列表
      */
     public void getCachedStatus() {
+        setRefreshing(swipeLayout,true);
         mSinceId = mStatusDao.getSinceId(STATUS, mType);
         mStatusList = mStatusDao.readStatus(STATUS_DEFAULT_LENGTH, mType);
         if (mStatusList == null || mStatusList.size() <= 0) {
@@ -284,7 +283,6 @@ public class MainTimeLineFragment extends BaseFragment implements
                     // 互相关注
                     case 1:
                         mType = STATUS_EACH_OTHER;
-
                         mStatusesAPI = new StatusesAPI(mAccessToken);
                         mStatusesAPI.bilateralTimeline(mSinceId, 0, 50, 1, false,
                                 StatusesAPI.FEATURE_ALL, true,

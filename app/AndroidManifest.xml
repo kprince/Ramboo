@@ -25,11 +25,13 @@
         android:theme="@style/Theme.Random.teal">
         <activity
             android:name=".activities.AccountsActivity"
+
             android:label="@string/app_name"
             android:screenOrientation="portrait"></activity>
 
         <activity
             android:name=".activities.AppMainActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -60,6 +62,7 @@
         </activity>
         <activity
             android:name=".activities.SendWeiboActivity"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_send_weibo"
             android:windowSoftInputMode="adjustResize"></activity>
     </application>

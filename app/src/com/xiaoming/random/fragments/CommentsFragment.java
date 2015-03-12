@@ -189,7 +189,8 @@ public class CommentsFragment extends BaseFragment implements SwipeRefreshLayout
         mCommentsListView.setLayoutManager(mLayoutManager);
         swipeLayout.setOnRefreshListener(this);
         Utils.setSwipeRefreshColorSchema(swipeLayout);
-        swipeLayout.setRefreshing(true);
+//        swipeLayout.setRefreshing(true);
+        setRefreshing(swipeLayout,true);
         getCachedComments();
         return rootView;
     }
