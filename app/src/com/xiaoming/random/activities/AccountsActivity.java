@@ -76,12 +76,10 @@ public class AccountsActivity extends BaseActivity {
         @Override
         public void onWeiboException(WeiboException e) {
             ErrorInfo info = ErrorInfo.parse(e.getMessage());
-            // System.out.println(info.toString());
             Toast.makeText(AccountsActivity.this, info.toString(),
                     Toast.LENGTH_LONG).show();
         }
     };
-    //    private SsoHandler mSsoHandler;
     private StatusDao mStatusDao;
 
     @Override
@@ -246,6 +244,7 @@ public class AccountsActivity extends BaseActivity {
         @Override
         public View getView(int position, View view, ViewGroup parent) {
             mUser = mUserList.get(position);
+            view.requestLayout();
             if (view == null) {
                 view = View.inflate(AccountsActivity.this, R.layout.user_layout, null);
             }

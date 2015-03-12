@@ -40,7 +40,11 @@ public class StatusDao {
      * @return
      */
     public String getDatabasePath() {
-        return mHelper.getReadableDatabase().getPath();
+        SQLiteDatabase db = mHelper.getReadableDatabase();
+        String path = db.getPath();
+        mHelper.getReadableDatabase().getPath();
+        db.close();
+        return path;
     }
 
     /**
