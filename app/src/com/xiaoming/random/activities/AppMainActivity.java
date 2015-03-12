@@ -123,7 +123,7 @@ public class AppMainActivity extends BaseActivity {
         Fragment fragment = TimeLineFragment.newInstance(MainTimeLineFragment.STATUS, mUserName);
         mRightFragments.append(HOME_INDEX, fragment);
         mFragMan = getSupportFragmentManager();
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        FragmentTransaction ft = mFragMan.beginTransaction();
         ft.add(R.id.container, fragment, MainTimeLineFragment.class.getSimpleName());
         ft.commit();
     }
@@ -147,6 +147,12 @@ public class AppMainActivity extends BaseActivity {
                     mMainContent.startAnimation(anim);
                     lastTranslate = moveFactor;
                 }
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                switchContent(mMenuPosition);
             }
         };
         mDrawerLayout.setDrawerListener(mToggle);
@@ -254,12 +260,16 @@ public class AppMainActivity extends BaseActivity {
         mDrawer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //屏蔽header点击
+                if (position==0)return;
                 for (int i = 1; i <= Constants.MENU_ITEMS.length; i++) {
                     View child = mDrawer.getChildAt(i);
                     cancelSelect(child);
                 }
                 selected(view);
-                switchContent(position);
+                mMenuPosition = position;
+                if (mDrawer.isShown())
+                    mDrawerLayout.closeDrawer(mDrawer);
             }
 
             /**
@@ -290,7 +300,6 @@ public class AppMainActivity extends BaseActivity {
      * 打开navigation Drawer
      * showNavigationDrawer
      */
-    @Override
     public void showNavigationDrawer() {
         if (!mDrawer.isShown()) {
             mDrawerLayout.openDrawer(mDrawer);
@@ -305,12 +314,11 @@ public class AppMainActivity extends BaseActivity {
         Fragment fragment;
         if (mFragMan == null)
             mFragMan = getSupportFragmentManager();
-        FragmentTransaction ft = mFragMan.beginTransaction();
         if (position - 1 != LOGOUT_INDEX)
-            hideAllFragments(ft);
+            hideAllFragments(mFragMan);
+        FragmentTransaction ft = mFragMan.beginTransaction();
         switch (position - 1) {
             case HOME_INDEX:
-
                 getSupportActionBar().setTitle(mUserName);
                 fragment = mRightFragments.get(HOME_INDEX);
                 if (fragment == null) {
@@ -381,9 +389,6 @@ public class AppMainActivity extends BaseActivity {
                 break;
         }
         ft.commit();
-        if (mDrawer.isShown())
-            mDrawerLayout.closeDrawer(mDrawer);
-        mMenuPosition = position;
     }
 
     @Override
@@ -399,9 +404,10 @@ public class AppMainActivity extends BaseActivity {
     /**
      * 隐藏所有已add到ft的fragment
      *
-     * @param ft FragmentTransaction
+     * @param fm FragmentManager
      */
-    private void hideAllFragments(FragmentTransaction ft) {
+    private void hideAllFragments(FragmentManager fm) {
+        FragmentTransaction ft = fm.beginTransaction();
         if (mRightFragments.get(COMMENTS_INDEX) != null)
             ft.hide(mRightFragments.get(COMMENTS_INDEX));
         if (mRightFragments.get(FRIENDS_INDEX) != null)
@@ -412,6 +418,7 @@ public class AppMainActivity extends BaseActivity {
             ft.hide(mRightFragments.get(SETTINGS_INDEX));
         if (mRightFragments.get(HOME_INDEX) != null)
             ft.hide(mRightFragments.get(HOME_INDEX));
+        ft.commit();
     }
 
     @Override

@@ -96,7 +96,6 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
         }
         initFriendsType();
         mDao = new StatusDao(getActivity());
-
     }
 
     private void initFriendsType() {
@@ -121,9 +120,9 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
         mCommentsView.setAdapter(mCommentsListAdapter);
         mCommentsView.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), true));
         swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh);
+        setRefreshing(swipeLayout,true);
         swipeLayout.setOnRefreshListener(this);
         Utils.setSwipeRefreshColorSchema(swipeLayout);
-        swipeLayout.setRefreshing(true);
         getCachedUsers();
         mSendBtn = (ButtonFloat) rootView.findViewById(R.id.back_to_top);
         mSendBtn.setBackgroundColor(getColor(R.attr.colorAccent));
@@ -142,9 +141,7 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
      * @return
      */
     private void getCachedUsers() {
-        setRefreshing(swipeLayout, true);
         mCommentList = mDao.getUserList(mType, DEFAULT_COUNT);
-
         if (mCommentList == null || mCommentList.size() == 0) {
             getUserList();
         } else {

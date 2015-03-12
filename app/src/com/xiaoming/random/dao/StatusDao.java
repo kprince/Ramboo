@@ -227,7 +227,6 @@ public class StatusDao {
      * @return
      */
     public User getUserByName(String name, String type) {
-        Log.e(StatusDao.class.getSimpleName(), "Query user by name : " + name);
         User user = null;
         SQLiteDatabase db = mHelper.getWritableDatabase();
         Cursor cursor = db.rawQuery(
@@ -237,7 +236,6 @@ public class StatusDao {
                 JSONObject obj = new JSONObject(cursor.getString(cursor
                         .getColumnIndex("user_str")));
                 user = User.parse(obj);
-                Log.e(StatusDao.class.getSimpleName(), "User : " + user.name);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

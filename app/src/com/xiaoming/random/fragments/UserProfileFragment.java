@@ -2,6 +2,8 @@ package com.xiaoming.random.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.util.Log;
@@ -37,6 +39,7 @@ import java.util.ArrayList;
 public class UserProfileFragment extends BaseFragment {
     public static final String USER_PROFILE = "USER_PROFILE";
     public static final String USER = "USER";
+    public static final String HAS_CACHE = "HAS_CACHE";
     private RequestListener mListener = new RequestListener() {
         @Override
         public void onComplete(String response) {
@@ -53,7 +56,6 @@ public class UserProfileFragment extends BaseFragment {
         @Override
         public void onWeiboException(WeiboException e) {
             ErrorInfo info = ErrorInfo.parse(e.getMessage());
-
             Toast.makeText(getActivity(), info.error == null ?
                             getString(R.string.networkUnavailable) : getString(R.string.loadFailed) + info.toString(),
                     Toast.LENGTH_LONG).show();
@@ -71,7 +73,19 @@ public class UserProfileFragment extends BaseFragment {
     private ButtonRectangle mButton;
     private StatusDao mDao;
     private FriendshipsAPI mFriendsAPI;
-
+    private android.os.Handler mHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            Bundle data = msg.getData();
+            User user = (User) data.getSerializable(USER);
+            if (!getActivity().isFinishing()&&data.getBoolean(HAS_CACHE,false))
+                return setUpViews(user);
+            initToken();
+            mUsersAPI = new UsersAPI(mAccessToken);
+            mUsersAPI.show(mScreenName, mListener);
+            return true;
+        }
+    });
     /**
      * required default constructor
      */
@@ -103,8 +117,14 @@ public class UserProfileFragment extends BaseFragment {
         if (mScreenName.equals(getUserName())) {
             mSelfFlag = true;
         }
-        mDao = new StatusDao(getActivity());
-        mUid = getUserID();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mDao = new StatusDao(getActivity());
+                mUid = getUserID();
+            }
+        }).start();
+
     }
 
     @Override
@@ -119,7 +139,6 @@ public class UserProfileFragment extends BaseFragment {
         getUser();
         //本应用用户
         if (mSelfFlag) {
-
             MainTimeLineFragment fragment = MainTimeLineFragment.newInstance(mScreenName, 0, 0);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(R.id.frg_container, fragment, null);
@@ -129,14 +148,30 @@ public class UserProfileFragment extends BaseFragment {
     }
 
     private void getUser() {
-        User user = mDao.getUserByName(mScreenName, USER);
-        if (user != null) {
-            setUpViews(user);
-        } else {
-            initToken();
-            mUsersAPI = new UsersAPI(mAccessToken);
-            mUsersAPI.show(mScreenName, mListener);
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                User user = mDao.getUserByName(mScreenName, USER);
+                Message msg = new Message();
+                Bundle bundle = new Bundle();
+                if (user!=null){
+                   bundle.putSerializable(USER,user);
+                   bundle.putBoolean(HAS_CACHE,true);
+                }else{
+                   bundle.putBoolean(HAS_CACHE,false);
+                }
+                msg.setData(bundle);
+                mHandler.sendMessage(msg);
+            }
+        }).start();
+//        User user = mDao.getUserByName(mScreenName, USER);
+//        if (user != null) {
+//            setUpViews(user);
+//        } else {
+//            initToken();
+//            mUsersAPI = new UsersAPI(mAccessToken);
+//            mUsersAPI.show(mScreenName, mListener);
+//        }
     }
 
     private void initToken() {
@@ -164,40 +199,47 @@ public class UserProfileFragment extends BaseFragment {
         mFriendCount = (TextView) rootView.findViewById(R.id.friendCount);
         mFollowerCount = (TextView) rootView.findViewById(R.id.followerCount);
         mButton = (ButtonRectangle) rootView.findViewById(R.id.userProBtn);
-        mButton.setOnClickListener(new View.OnClickListener() {
+        new Thread(new Runnable() {
             @Override
-            public void onClick(View v) {
-                if (mFriendsAPI == null) initToken();
-                User user = (User) v.getTag();
-                String btnText = ((ButtonRectangle) v).getText();
-                if (btnText.equals(getString(R.string.cancelFollow))) {
-                    mFriendsAPI.destroy(Long.parseLong(user.id), user.screen_name, new FriendshipRequestListener());
-                    return;
-                }
-                mFriendsAPI.create(Long.parseLong(user.id), user.screen_name, new FriendshipRequestListener());
+            public void run() {
+                mButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (mFriendsAPI == null) initToken();
+                        User user = (User) v.getTag();
+                        String btnText = ((ButtonRectangle) v).getText();
+                        if (btnText.equals(getString(R.string.cancelFollow))) {
+                            mFriendsAPI.destroy(Long.parseLong(user.id), user.screen_name, new FriendshipRequestListener());
+                            return;
+                        }
+                        mFriendsAPI.create(Long.parseLong(user.id), user.screen_name, new FriendshipRequestListener());
+                    }
+                });
+                mAvatar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        User user = (User) v.getTag();
+                        Intent intent = new Intent(getActivity(), GalleryActivity.class);
+                        intent.putExtra("multi", false);//多图
+                        intent.putExtra("position", 0);//多图时选中的图片位置
+                        ArrayList<String> list = new ArrayList<String>();
+                        list.add(user.avatar_hd);
+                        intent.putStringArrayListExtra("uriList", list);
+                        startActivity(intent);
+                    }
+                });
             }
-        });
-        mAvatar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                User user = (User) v.getTag();
-                Intent intent = new Intent(getActivity(), GalleryActivity.class);
-                intent.putExtra("multi", false);//多图
-                intent.putExtra("position", 0);//多图时选中的图片位置
-                ArrayList<String> list = new ArrayList<String>();
-                list.add(user.avatar_hd);
-                intent.putStringArrayListExtra("uriList", list);
-                startActivity(intent);
-            }
-        });
+        }).start();
+
     }
+
 
     /**
      * 创建user视图
      *
      * @param user
      */
-    private void setUpViews(User user) {
+    private boolean setUpViews(User user) {
         if (mUserCity != null) {
             if (user != null) {
                 mUserCity.setText(user.gender.equals("n") ? getString(R.string.sexNA) : (user.gender.equals("f") ?
@@ -225,6 +267,7 @@ public class UserProfileFragment extends BaseFragment {
                 mAvatar.setTag(user);
             }
         }
+        return true;
     }
 
     /**
