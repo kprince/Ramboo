@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.xiaoming.random.R;
+import com.xiaoming.random.dao.StatusDao;
 import com.xiaoming.random.utils.Utils;
 
 public class BaseActivity extends ActionBarActivity {
@@ -30,6 +31,7 @@ public class BaseActivity extends ActionBarActivity {
     public static final String SF_USER_UID = "UID";//微博用户id
     public static final String SF_USER_AVATAR = "USER_AVATAR";//微博用户头像
     public static final String SF_THEME_COLOR = "THEME_COLOR";
+    protected StatusDao mDao;
 
     public static DisplayImageOptions UIL_OPTIONS = new DisplayImageOptions.Builder()
             .showImageForEmptyUri(R.drawable.ic_empty)
@@ -109,6 +111,7 @@ public class BaseActivity extends ActionBarActivity {
         String themeColor = getUserPref().getString(SF_THEME_COLOR, "Teal");
         setThemeColor(themeColor);
         setStatusBarMDStyle();
+        mDao = new StatusDao();
     }
 
 

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Debug;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -75,14 +76,11 @@ public class AppMainActivity extends BaseActivity {
     }
 
     public void onCreate(Bundle savedInstanceState) {
+//        Debug.startMethodTracing(TAG);
         super.onCreate(savedInstanceState);
         checkFirstTimeUse();
         mUserName = getUserName();
         setContentView(R.layout.main);
-        findViews();
-        mainContentAnimation();
-        initDrawer();
-        setToolBar(mToolbar, BaseActivity.INDEX, mUserName);
         if (savedInstanceState == null) {
             setInitFragment();
         } else {
@@ -95,8 +93,12 @@ public class AppMainActivity extends BaseActivity {
             mMenuPosition = savedInstanceState.getInt(MENU_POSITION, 1);
             switchContent(mMenuPosition);
         }
+        findViews();
+        mainContentAnimation();
+        initDrawer();
+        setToolBar(mToolbar, BaseActivity.INDEX, mUserName);
+//        Debug.stopMethodTracing();
     }
-
     /**
      * 非正常退出时恢复Fragments到SparseArray
      *

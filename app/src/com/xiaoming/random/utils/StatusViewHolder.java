@@ -30,6 +30,7 @@ import com.sina.weibo.sdk.exception.WeiboException;
 import com.sina.weibo.sdk.net.RequestListener;
 import com.sina.weibo.sdk.openapi.legacy.FavoritesAPI;
 import com.xiaoming.random.R;
+import com.xiaoming.random.RandomApplication;
 import com.xiaoming.random.activities.BaseActivity;
 import com.xiaoming.random.activities.GalleryActivity;
 import com.xiaoming.random.activities.LineDetailActivity;
@@ -88,8 +89,8 @@ public class StatusViewHolder extends RecyclerView.ViewHolder implements OnClick
 
     }
 
-    public void setContext(Context context, Oauth2AccessToken token, MainTimeLineFragment frag) {
-        mContext = context;
+    public void setContext(Oauth2AccessToken token, MainTimeLineFragment frag) {
+        mContext = RandomApplication.getContext();
         mToken = token;
         mFragment = frag;
     }
@@ -108,7 +109,6 @@ public class StatusViewHolder extends RecyclerView.ViewHolder implements OnClick
         mCommentIt = (ButtonFlat) view.findViewById(R.id.comment_it);
         mExportIt = (ButtonFlat) view.findViewById(R.id.export_it);
         mFavoriteIt = (ButtonFlat) view.findViewById(R.id.favorite_it);
-
         statusCreateAt = (TextView) view.findViewById(R.id.statusCreateAt);
         repostStatus = (TextView) view.findViewById(R.id.repostStatus);
         statusImage = (ImageView) view.findViewById(R.id.statusImage);
@@ -164,8 +164,6 @@ public class StatusViewHolder extends RecyclerView.ViewHolder implements OnClick
                     userImage, BaseActivity.UIL_OPTIONS);
             // 微博内容
             StatusUtils.dealStatusText(mContext, statusTextView, status.text, null);
-            //statusTextView.setText(status.text);
-//            OauthUtils.doLinkify(statusTextView);
             statusTextView.setTag(status);
             statusCreateAt.setText(TimeUtils
                     .parseTime(status.createdAt)
@@ -266,30 +264,31 @@ public class StatusViewHolder extends RecyclerView.ViewHolder implements OnClick
 
     @Override
     public void onClick(View v) {
+        Context context = v.getContext();
         switch (v.getId()) {
             case R.id.repost_it:
-                repostStatus(v);
+                repostStatus(v,context);
                 break;
             case R.id.comment_it:
-                commentStatus(v);
+                commentStatus(v,context);
                 break;
             case R.id.export_it:
                 saveWeiboCard();
                 break;
             case R.id.favorite_it:
-                favoritesStatus(v);
+                favoritesStatus(v,context);
                 break;
             case R.id.userNickName:
-                showUserProfile(v);
+                showUserProfile(v,context);
                 break;
             case R.id.userImage:
-                showUserProfile(v);
+                showUserProfile(v,context);
                 break;
             case R.id.status:
-                showStatusDetail(v);
+                showStatusDetail(v,context);
                 break;
             case R.id.ret_status_wrapper:
-                showStatusDetail(v);
+                showStatusDetail(v,context);
                 break;
             default:
                 break;
@@ -322,7 +321,7 @@ public class StatusViewHolder extends RecyclerView.ViewHolder implements OnClick
      *
      * @param v
      */
-    private void favoritesStatus(View v) {
+    private void favoritesStatus(View v,Context context) {
         long id = Long.parseLong((String) v.getTag());
         FavoritesAPI favoritesAPI = new FavoritesAPI(mToken);
         String text = ((ButtonFlat) v).getText();
@@ -341,16 +340,16 @@ public class StatusViewHolder extends RecyclerView.ViewHolder implements OnClick
      *
      * @param v
      */
-    private void showStatusDetail(View v) {
+    private void showStatusDetail(View v,Context context) {
         if (mContext instanceof LineDetailActivity)
             return;
         if (v.getTag() == null)
             return;
-        Intent intent = new Intent(mContext, LineDetailActivity.class);
+        Intent intent = new Intent(context, LineDetailActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable(MainTimeLineFragment.STATUS, (Status) v.getTag());
         intent.putExtras(bundle);
-        mContext.startActivity(intent);
+        context.startActivity(intent);
     }
 
     /**
@@ -358,7 +357,7 @@ public class StatusViewHolder extends RecyclerView.ViewHolder implements OnClick
      *
      * @param v
      */
-    private void showUserProfile(View v) {
+    private void showUserProfile(View v,Context context) {
         WeiboUser user = (WeiboUser) v.getTag();
         if (user == null)
             return;
@@ -366,7 +365,7 @@ public class StatusViewHolder extends RecyclerView.ViewHolder implements OnClick
         Bundle extras = new Bundle();
         extras.putSerializable(UserProfileFragment.USER, user);
         intent.putExtras(extras);
-        mContext.startActivity(intent);
+        context.startActivity(intent);
     }
 
     /**
@@ -374,12 +373,13 @@ public class StatusViewHolder extends RecyclerView.ViewHolder implements OnClick
      *
      * @param v
      */
-    private void commentStatus(View v) {
+    private void commentStatus(View v,Context context) {
+
         long id = Long.parseLong((String) v.getTag());
-        Intent intent2 = new Intent(mContext, SendWeiboActivity.class);
-        intent2.putExtra(SendWeiboActivity.SEND_WEIBO_ID, id);
-        intent2.putExtra(SendWeiboActivity.SEND_WEIBO_TYPE, 2);
-        mContext.startActivity(intent2);
+        Intent intent = new Intent(mContext, SendWeiboActivity.class);
+        intent.putExtra(SendWeiboActivity.SEND_WEIBO_ID, id);
+        intent.putExtra(SendWeiboActivity.SEND_WEIBO_TYPE, 2);
+        context.startActivity(intent);
     }
 
     /**
@@ -387,14 +387,15 @@ public class StatusViewHolder extends RecyclerView.ViewHolder implements OnClick
      *
      * @param v
      */
-    private void repostStatus(View v) {
+    private void repostStatus(View v,Context context) {
         Status status = (Status) v.getTag();
         Intent intent = new Intent(mContext, SendWeiboActivity.class);
         intent.putExtra(SendWeiboActivity.SEND_WEIBO_ID, Long.parseLong(status.id));
         intent.putExtra(SendWeiboActivity.SEND_WEIBO_TYPE, 1);
         intent.putExtra(SendWeiboActivity.SEND_WEIBO_TXT,
                 status.repostStatus != null ? "//@" + status.user.name + "：" + status.text : getString(R.string.repostWeibo));
-        mContext.startActivity(intent);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
 
     class FavoritesListener implements RequestListener {
@@ -516,7 +517,7 @@ public class StatusViewHolder extends RecyclerView.ViewHolder implements OnClick
                 intent.putStringArrayListExtra("uriList", mUriList);
                 intent.putExtra("position", 0);
                 intent.putExtra("multi", false);
-                mContext.startActivity(intent);
+                v.getContext().startActivity(intent);
             }
         }
 
@@ -531,7 +532,8 @@ public class StatusViewHolder extends RecyclerView.ViewHolder implements OnClick
                 intent.putStringArrayListExtra("uriList", mUriList);
                 intent.putExtra("position", position);
                 intent.putExtra("multi", true);
-                mContext.startActivity(intent);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                view.getContext().startActivity(intent);
             }
         }
     }

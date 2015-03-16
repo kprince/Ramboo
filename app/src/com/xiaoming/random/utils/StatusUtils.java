@@ -138,6 +138,7 @@ public class StatusUtils {
         public void onClick(View widget) {
             Intent intent = new Intent(context, UserProfileActivity.class);
             intent.putExtra(StatusViewHolder.SCREEN_NAME, name);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
         }
 

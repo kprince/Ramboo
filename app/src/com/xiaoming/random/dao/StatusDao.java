@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.sina.weibo.sdk.auth.Oauth2AccessToken;
+import com.xiaoming.random.RandomApplication;
 import com.xiaoming.random.activities.BaseActivity;
 import com.xiaoming.random.fragments.MainTimeLineFragment;
 import com.xiaoming.random.fragments.UserProfileFragment;
@@ -25,13 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StatusDao {
-    private UserSQLiteDBHelper mHelper;
+    private SQLiteDatabaseHelper mHelper;
     private long mAuthUserID;
 
-    public StatusDao(Context context) {
-//        System.out.println(context==null);
-        mHelper = new UserSQLiteDBHelper(context);
-        mAuthUserID = getAuthUserID(context);
+    public StatusDao() {
+        mHelper = SQLiteDatabaseHelper.getInstance();
+        mAuthUserID = getAuthUserID(RandomApplication.getContext());
     }
 
     /**
@@ -43,7 +43,7 @@ public class StatusDao {
         SQLiteDatabase db = mHelper.getReadableDatabase();
         String path = db.getPath();
         mHelper.getReadableDatabase().getPath();
-        db.close();
+        //db.close();
         return path;
     }
 
@@ -70,7 +70,7 @@ public class StatusDao {
         db.execSQL("delete from user");
         db.setTransactionSuccessful();
         db.endTransaction();
-        db.close();
+        //db.close();
     }
 
     /**
@@ -92,7 +92,7 @@ public class StatusDao {
         } catch (JSONException e) {
             e.printStackTrace();
         } finally {
-            db.close();
+            //db.close();
         }
     }
 
@@ -104,7 +104,7 @@ public class StatusDao {
             result.add(cursor.getString(0));
         }
         cursor.close();
-        db.close();
+        //db.close();
         return result;
     }
 
@@ -123,11 +123,11 @@ public class StatusDao {
             values.put("token", token.getToken());
             values.put("expires", token.getExpiresTime());
             db.replace("auth_user", null, values);
-            db.close();
+            //db.close();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            db.close();
+            //db.close();
         }
     }
 
@@ -156,7 +156,7 @@ public class StatusDao {
             list.add(user);
         }
         cursor.close();
-        db.close();
+        //db.close();
         return list;
     }
 
@@ -184,7 +184,7 @@ public class StatusDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            db.close();
+            //db.close();
         }
     }
     /**
@@ -219,7 +219,7 @@ public class StatusDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            db.close();
+            //db.close();
         }
     }
 
@@ -245,7 +245,7 @@ public class StatusDao {
 
         }
         cursor.close();
-        db.close();
+        //db.close();
         return user;
     }
 
@@ -271,7 +271,7 @@ public class StatusDao {
 
         }
         cursor.close();
-        db.close();
+        //db.close();
         return user;
     }
 
@@ -297,7 +297,7 @@ public class StatusDao {
             list.add(user);
         }
         cursor.close();
-        db.close();
+        //db.close();
         return list;
     }
 
@@ -326,7 +326,7 @@ public class StatusDao {
 
         }
         cursor.close();
-        db.close();
+        //db.close();
         return user;
     }
 
@@ -376,7 +376,7 @@ public class StatusDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            db.close();
+            //db.close();
         }
     }
 
@@ -403,11 +403,11 @@ public class StatusDao {
                 values.put("comments_str", status);
                 db.replace("comments", null, values);
             }
-            db.close();
+            //db.close();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            db.close();
+            //db.close();
         }
     }
 
@@ -432,11 +432,11 @@ public class StatusDao {
                 values.put("auth_id", mAuthUserID);
                 db.replace("sta_comments", null, values);
             }
-            db.close();
+            //db.close();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            db.close();
+            //db.close();
         }
 
     }
@@ -455,7 +455,7 @@ public class StatusDao {
             sinceId = cursor.getLong(cursor.getColumnIndex("id"));
         }
         cursor.close();
-        db.close();
+        //db.close();
         return sinceId;
     }
 
@@ -473,7 +473,7 @@ public class StatusDao {
             sinceId = cursor.getLong(cursor.getColumnIndex("id"));
         }
         cursor.close();
-        db.close();
+        //db.close();
         return sinceId;
     }
 
@@ -496,7 +496,7 @@ public class StatusDao {
                 staList.add(status);
         }
         cursor.close();
-        db.close();
+        //db.close();
         return staList;
     }
 
@@ -519,7 +519,7 @@ public class StatusDao {
             staList.add(comment);
         }
         cursor.close();
-        db.close();
+        //db.close();
         return staList;
     }
 
@@ -543,7 +543,7 @@ public class StatusDao {
             staList.add(comment);
         }
         cursor.close();
-        db.close();
+        //db.close();
         return staList;
     }
 }

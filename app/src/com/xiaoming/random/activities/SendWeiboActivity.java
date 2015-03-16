@@ -70,7 +70,6 @@ public class SendWeiboActivity extends BaseActivity implements View.OnClickListe
             .resetViewBeforeLoading(true).cacheOnDisk(true)
             .bitmapConfig(Bitmap.Config.RGB_565).considerExifParams(true)
             .displayer(new FadeInBitmapDisplayer(300)).build();
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -138,8 +137,7 @@ public class SendWeiboActivity extends BaseActivity implements View.OnClickListe
             long uid = getUserID();
             if (uid > 0) {
                 if (mToken == null) {
-                    StatusDao dao = new StatusDao(this);
-                    AuthUser user = dao.getAuthUser(uid);
+                    AuthUser user = mDao.getAuthUser(uid);
                     mToken = new Oauth2AccessToken(user.token, user.expires);
                 }
             }
@@ -147,6 +145,7 @@ public class SendWeiboActivity extends BaseActivity implements View.OnClickListe
     }
 
     private void initAPI() {
+
         if (mToken != null && mToken.isSessionValid())
             mStatusApi = new StatusesAPI(mToken);
         mCommentApi = new CommentsAPI(mToken);
@@ -308,8 +307,7 @@ public class SendWeiboActivity extends BaseActivity implements View.OnClickListe
      */
     private void showEmotions() {
         if (mAdapter == null) {
-            StatusDao dao = new StatusDao(SendWeiboActivity.this);
-            mEmotionsUrlList = dao.getEmotions();
+            mEmotionsUrlList = mDao.getEmotions();
             mAdapter = new EmotionsGridAdapter();
             mEmotionsGrid.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();

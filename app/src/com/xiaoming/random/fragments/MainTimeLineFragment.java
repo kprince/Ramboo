@@ -6,6 +6,11 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Debug;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -57,7 +62,6 @@ public class MainTimeLineFragment extends BaseFragment implements
     private static final int STATUS_DEFAULT_LENGTH = 50;
     protected final String TAG = "MainTimeLineFragment";
     private int mTabPosition;
-//    private long mMaxId = 0;
     private long mSinceId = 0;
     private long mUid;
     private Oauth2AccessToken mAccessToken;
@@ -73,9 +77,9 @@ public class MainTimeLineFragment extends BaseFragment implements
     private double mLongitude = 0.0;
     private int mAtFlag;
     private String mScreenName;
-    private StatusDao mStatusDao;
     private RecyclerView.LayoutManager mLayoutManager;
     private RandomButtonFloat mBack2Top;
+    private View mRootView;
 
     public static MainTimeLineFragment newInstance(String screenName, int position, int atFlag) {
         MainTimeLineFragment fragment = new MainTimeLineFragment();
@@ -96,6 +100,14 @@ public class MainTimeLineFragment extends BaseFragment implements
         super.onSaveInstanceState(outState);
     }
 
+    @Override
+       public boolean notifyDataSetChanged(Message msg) {
+        int what = msg.what;
+        if (what==1&&mStatusAdapter!=null)
+            mStatusAdapter.notifyDataSetChanged();
+        if (swipeLayout.isRefreshing())swipeLayout.setRefreshing(false);
+        return true;
+    }
 
     /**
      * 点击收藏按钮时触发刷新列表
@@ -107,9 +119,6 @@ public class MainTimeLineFragment extends BaseFragment implements
             swipeLayout.setRefreshing(true);
         onRefresh();
     }
-
-
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -127,26 +136,27 @@ public class MainTimeLineFragment extends BaseFragment implements
             mSinceId = 0l;
         }
 //        mMaxId = 0;
-        mStatusDao = new StatusDao(getActivity());
         initStatusType();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.main_time_line_layout,
+        if (Constants.DEVELOPER_MODE)
+            Debug.startMethodTracing(TAG);
+         mRootView = inflater.inflate(R.layout.main_time_line_layout,
                 container, false);
-        swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh);
+        swipeLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.swipe_refresh);
         swipeLayout.setOnRefreshListener(this);
         Utils.setSwipeRefreshColorSchema(swipeLayout);
-        mStatusListView = (RecyclerView) rootView.findViewById(R.id.main_time_line);
+        mStatusListView = (RecyclerView) mRootView.findViewById(R.id.main_time_line);
         mLayoutManager = new LinearLayoutManager(getActivity());
         mStatusListView.setLayoutManager(mLayoutManager);
         mStatusAdapter = new StatusAdapter();
         mStatusListView.setAdapter(mStatusAdapter);
         //      ImageLoader滑动停止加载图片
         mStatusListView.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), true));
-        mBack2Top = (RandomButtonFloat) rootView.findViewById(R.id.back_to_top);
+        mBack2Top = (RandomButtonFloat) mRootView.findViewById(R.id.back_to_top);
         mBack2Top.setBackgroundColor(getColor(R.attr.colorAccent));
         mBack2Top.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,16 +164,19 @@ public class MainTimeLineFragment extends BaseFragment implements
                 mLayoutManager.scrollToPosition(0);
             }
         });
-        getCachedStatus();
-        return rootView;
+        setRefreshing(swipeLayout, true);
+        newGetCacheTask();
+        if (Constants.DEVELOPER_MODE)
+            Debug.stopMethodTracing();
+        return mRootView;
     }
+
 
     private void initToken() {
         if (mAccessToken == null) {
             long uid = getUserID();
             if (uid > 0) {
-                StatusDao dao = new StatusDao(getActivity());
-                AuthUser user = dao.getAuthUser(uid);
+                AuthUser user = mDao.getAuthUser(uid);
                 mAccessToken = new Oauth2AccessToken(user.token, user.expires);
             }
         }
@@ -172,16 +185,15 @@ public class MainTimeLineFragment extends BaseFragment implements
     /**
      * 获取缓存的微博列表
      */
-    public void getCachedStatus() {
-        setRefreshing(swipeLayout,true);
-        mSinceId = mStatusDao.getSinceId(STATUS, mType);
-        mStatusList = mStatusDao.readStatus(STATUS_DEFAULT_LENGTH, mType);
-        if (mStatusList == null || mStatusList.size() <= 0) {
+    @Override
+    public void getCachedContent() {
+//        setRefreshing(swipeLayout,true);
+        mSinceId = mDao.getSinceId(STATUS, mType);
+        mStatusList = mDao.readStatus(STATUS_DEFAULT_LENGTH, mType);
+        if (mStatusList == null || mStatusList.size() <= 0)
             getTimeLine();
-        } else {
-            mStatusAdapter.notifyDataSetChanged();
-            setRefreshing(swipeLayout, false);
-        }
+        else
+            mHandler.sendEmptyMessage(1);
     }
 
     /**
@@ -401,7 +413,7 @@ public class MainTimeLineFragment extends BaseFragment implements
                     .inflate(R.layout.status_layout, parent, false);
             StatusViewHolder holder = new StatusViewHolder(view);
             initToken();
-            holder.setContext(getActivity(), mAccessToken, MainTimeLineFragment.this);
+            holder.setContext(mAccessToken, MainTimeLineFragment.this);
             return holder;
         }
 

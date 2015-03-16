@@ -2,6 +2,9 @@ package com.xiaoming.random.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Debug;
+import android.os.Message;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +25,7 @@ import com.sina.weibo.sdk.net.RequestListener;
 import com.sina.weibo.sdk.openapi.legacy.FriendshipsAPI;
 import com.sina.weibo.sdk.openapi.models.ErrorInfo;
 import com.sina.weibo.sdk.utils.LogUtil;
+import com.xiaoming.random.Constants;
 import com.xiaoming.random.R;
 import com.xiaoming.random.activities.BaseActivity;
 import com.xiaoming.random.activities.UserProfileActivity;
@@ -63,7 +67,6 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
     private FriendShipListListener mCommentsListListener = new FriendShipListListener();
     private FriendShipListAdapter mCommentsListAdapter = new FriendShipListAdapter();
     private String mType;
-    private StatusDao mDao;
     private ButtonFloat mSendBtn;
 
 
@@ -95,7 +98,6 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
             mTabPosition = bundle.getInt(POSITION);
         }
         initFriendsType();
-        mDao = new StatusDao(getActivity());
     }
 
     private void initFriendsType() {
@@ -114,17 +116,17 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.main_time_line_layout, container, false);
-        mCommentsView = (RecyclerView) rootView.findViewById(R.id.main_time_line);
+        if (Constants.DEVELOPER_MODE)
+            Debug.startMethodTracing(TAG);
+        mRootView = inflater.inflate(R.layout.main_time_line_layout, container, false);
+        mCommentsView = (RecyclerView) mRootView.findViewById(R.id.main_time_line);
         mCommentsView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mCommentsView.setAdapter(mCommentsListAdapter);
         mCommentsView.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), true));
-        swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh);
-        setRefreshing(swipeLayout,true);
+        swipeLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.swipe_refresh);
         swipeLayout.setOnRefreshListener(this);
         Utils.setSwipeRefreshColorSchema(swipeLayout);
-        getCachedUsers();
-        mSendBtn = (ButtonFloat) rootView.findViewById(R.id.back_to_top);
+        mSendBtn = (ButtonFloat) mRootView.findViewById(R.id.back_to_top);
         mSendBtn.setBackgroundColor(getColor(R.attr.colorAccent));
         mSendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,7 +134,26 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
                 mCommentsView.getLayoutManager().scrollToPosition(0);
             }
         });
-        return rootView;
+        setRefreshing(swipeLayout, true);
+        newGetCacheTask();
+        if (Constants.DEVELOPER_MODE)
+            Debug.stopMethodTracing();
+        return mRootView;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+    }
+
+    @Override
+    public boolean notifyDataSetChanged(Message msg) {
+        int what = msg.what;
+        if (what==1&&mCommentsListAdapter!=null)
+            mCommentsListAdapter.notifyDataSetChanged();
+        if (swipeLayout.isRefreshing())swipeLayout.setRefreshing(false);
+        return true;
     }
 
     /**
@@ -140,13 +161,13 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
      *
      * @return
      */
-    private void getCachedUsers() {
+    @Override
+    public void getCachedContent() {
         mCommentList = mDao.getUserList(mType, DEFAULT_COUNT);
         if (mCommentList == null || mCommentList.size() == 0) {
             getUserList();
         } else {
-            mCommentsListAdapter.notifyDataSetChanged();
-            setRefreshing(swipeLayout, false);
+            mHandler.sendEmptyMessage(1);
         }
     }
 
@@ -257,8 +278,8 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
         private void setUpView(ViewHolder holder, int position) {
             WeiboUser user = mCommentList.get(position);
             if (!TextUtils.isEmpty(user.name)) {
-                holder.userImage.setTag(user.name);
-                holder.userName.setTag(user.name);
+                holder.userImage.setTag(user);
+                holder.userName.setTag(user);
                 holder.userDesc.setText(user.description);
                 String gender;
                 if (user.gender.equals("n")) {
@@ -320,7 +341,9 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), UserProfileActivity.class);
-                intent.putExtra(SCREEN_NAME, v.getTag().toString());
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(UserProfileFragment.USER,(WeiboUser)v.getTag());
+                intent.putExtras(bundle);
                 startActivity(intent);
             }
         }

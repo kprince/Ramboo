@@ -85,7 +85,7 @@ public class AccountsActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mStatusDao = new StatusDao(this);
+        mStatusDao = new StatusDao();
         setContentView(R.layout.acount_layout);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mWeiboAuth = new WeiboAuth(this, Constants.APP_KEY, Constants.REDIRECT_URL, Constants.SCOPE);

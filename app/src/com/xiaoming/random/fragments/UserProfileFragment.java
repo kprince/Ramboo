@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.util.Log;
@@ -26,7 +27,6 @@ import com.xiaoming.random.R;
 import com.xiaoming.random.activities.AccountsActivity;
 import com.xiaoming.random.activities.BaseActivity;
 import com.xiaoming.random.activities.GalleryActivity;
-import com.xiaoming.random.dao.StatusDao;
 import com.xiaoming.random.model.AuthUser;
 import com.xiaoming.random.model.WeiboUser;
 import com.xiaoming.random.tasks.AsyncSave2DBTask;
@@ -71,7 +71,6 @@ public class UserProfileFragment extends BaseFragment {
     private long mUid;
     private boolean mSelfFlag;
     private ButtonRectangle mButton;
-    private StatusDao mDao;
     private FriendshipsAPI mFriendsAPI;
     private android.os.Handler mHandler = new Handler(new Handler.Callback() {
         @Override
@@ -149,7 +148,6 @@ public class UserProfileFragment extends BaseFragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                mDao = new StatusDao(getActivity());
                 mUid = getUserID();
             }
         }).start();
@@ -158,8 +156,8 @@ public class UserProfileFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.user_profile_hearder, container, false);
-        findViews(rootView);
+        mRootView = inflater.inflate(R.layout.user_profile_hearder, container, false);
+        findViews(mRootView);
         if (mSelfFlag)
             mButton.setVisibility(View.GONE);
         else
@@ -175,7 +173,6 @@ public class UserProfileFragment extends BaseFragment {
             }).start();
             setUpViews(mUser);
         }
-
         //本应用用户
         if (mSelfFlag) {
             MainTimeLineFragment fragment = MainTimeLineFragment.newInstance(mScreenName, 0, 0);
@@ -183,8 +180,9 @@ public class UserProfileFragment extends BaseFragment {
             ft.add(R.id.frg_container, fragment, null);
             ft.commit();
         }
-        return rootView;
+        return mRootView;
     }
+
 
     private void getUser() {
         new Thread(new Runnable() {
