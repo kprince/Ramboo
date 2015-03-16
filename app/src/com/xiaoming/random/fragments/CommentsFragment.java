@@ -299,7 +299,6 @@ public class CommentsFragment extends BaseFragment implements SwipeRefreshLayout
          */
         private void setUpView(ViewHolder holder, int position) {
             Comment comment = mCommentList.get(position);
-
             holder.userName.setText(comment.user.name);
             holder.userName.setTag(comment.user.name);
             holder.userImage.setTag(comment.user.name);
