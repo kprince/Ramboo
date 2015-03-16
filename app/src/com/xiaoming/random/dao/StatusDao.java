@@ -8,14 +8,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.sina.weibo.sdk.auth.Oauth2AccessToken;
-import com.sina.weibo.sdk.openapi.models.Comment;
-import com.sina.weibo.sdk.openapi.models.Status;
-import com.sina.weibo.sdk.openapi.models.User;
 import com.xiaoming.random.activities.BaseActivity;
 import com.xiaoming.random.fragments.MainTimeLineFragment;
 import com.xiaoming.random.fragments.UserProfileFragment;
 import com.xiaoming.random.model.AuthUser;
+import com.xiaoming.random.model.Comment;
 import com.xiaoming.random.model.Emotion;
+import com.xiaoming.random.model.Status;
+import com.xiaoming.random.model.WeiboUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -147,7 +147,7 @@ public class StatusDao {
             try {
                 JSONObject obj = new JSONObject(cursor.getString(cursor
                         .getColumnIndex("user_str")));
-                user = new AuthUser(User.parse(obj));
+                user = new AuthUser(WeiboUser.parse(obj));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -169,7 +169,7 @@ public class StatusDao {
         SQLiteDatabase db = mHelper.getWritableDatabase();
         try {
             JSONObject json = new JSONObject(userStr);
-            User user = User.parse(json);
+            WeiboUser user = WeiboUser.parse(json);
             db.beginTransaction();
             db.execSQL("delete from user where auth_id = " + mAuthUserID + " and name = '" + user.name + "' and type ='USER'");
             ContentValues values = new ContentValues();
@@ -187,7 +187,6 @@ public class StatusDao {
             db.close();
         }
     }
-
     /**
      * 保存关注列表中的User
      *
@@ -206,7 +205,7 @@ public class StatusDao {
                 for (int i = 0; i < array.length(); i++) {
                     ContentValues values = new ContentValues();
                     JSONObject obj = array.optJSONObject(i);
-                    User user = User.parse(obj);
+                    WeiboUser user = WeiboUser.parse(obj);
                     values.put("id", user.id);
                     values.put("user_str", array.get(i).toString());
                     values.put("type", type);
@@ -230,8 +229,8 @@ public class StatusDao {
      * @param
      * @return
      */
-    public User getUserByName(String name, String type) {
-        User user = null;
+    public WeiboUser getUserByName(String name, String type) {
+        WeiboUser user = null;
         SQLiteDatabase db = mHelper.getWritableDatabase();
         Cursor cursor = db.rawQuery(
                 "select id ,user_str from user where auth_id = " + mAuthUserID + " and type = '" + type + "' and name =  '" + name + "'", null);
@@ -239,7 +238,7 @@ public class StatusDao {
             try {
                 JSONObject obj = new JSONObject(cursor.getString(cursor
                         .getColumnIndex("user_str")));
-                user = User.parse(obj);
+                user = WeiboUser.parse(obj);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -256,8 +255,8 @@ public class StatusDao {
      * @param id
      * @return
      */
-    public User getUserById(Long id) {
-        User user = null;
+    public WeiboUser getUserById(Long id) {
+        WeiboUser user = null;
         SQLiteDatabase db = mHelper.getWritableDatabase();
         Cursor cursor = db.rawQuery(
                 "select id ,user_str from user where auth_id = " + mAuthUserID + " and id =  " + id, null);
@@ -265,7 +264,7 @@ public class StatusDao {
             try {
                 JSONObject obj = new JSONObject(cursor.getString(cursor
                         .getColumnIndex("user_str")));
-                user = User.parse(obj);
+                user = WeiboUser.parse(obj);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -281,9 +280,9 @@ public class StatusDao {
      *
      * @return
      */
-    public List<User> getUserList(String type, int length) {
-        List<User> list = new ArrayList<>();
-        User user = null;
+    public List<WeiboUser> getUserList(String type, int length) {
+        List<WeiboUser> list = new ArrayList<>();
+        WeiboUser user = null;
         SQLiteDatabase db = mHelper.getWritableDatabase();
         Cursor cursor = db.rawQuery(
                 "select user_str from user where auth_id = " + mAuthUserID + " and type = '" + type + "' limit  " + length, null);
@@ -291,7 +290,7 @@ public class StatusDao {
             try {
                 JSONObject obj = new JSONObject(cursor.getString(cursor
                         .getColumnIndex("user_str")));
-                user = User.parse(obj);
+                user = WeiboUser.parse(obj);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -318,7 +317,7 @@ public class StatusDao {
             try {
                 JSONObject obj = new JSONObject(cursor.getString(cursor
                         .getColumnIndex("user_str")));
-                user = new AuthUser(User.parse(obj));
+                user = new AuthUser(WeiboUser.parse(obj));
             } catch (JSONException e) {
                 e.printStackTrace();
             }

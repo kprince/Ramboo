@@ -17,8 +17,6 @@ import com.sina.weibo.sdk.auth.Oauth2AccessToken;
 import com.sina.weibo.sdk.exception.WeiboException;
 import com.sina.weibo.sdk.net.RequestListener;
 import com.sina.weibo.sdk.openapi.CommentsAPI;
-import com.sina.weibo.sdk.openapi.models.Comment;
-import com.sina.weibo.sdk.openapi.models.CommentList;
 import com.sina.weibo.sdk.openapi.models.ErrorInfo;
 import com.sina.weibo.sdk.utils.LogUtil;
 import com.xiaoming.random.R;
@@ -28,6 +26,7 @@ import com.xiaoming.random.activities.UserProfileActivity;
 import com.xiaoming.random.dao.StatusDao;
 import com.xiaoming.random.listener.PauseOnScrollListener;
 import com.xiaoming.random.model.AuthUser;
+import com.xiaoming.random.model.Comment;
 import com.xiaoming.random.tasks.AsyncSave2DBTask;
 import com.xiaoming.random.utils.OauthUtils;
 import com.xiaoming.random.utils.StatusUtils;
@@ -224,7 +223,7 @@ public class CommentsFragment extends BaseFragment implements SwipeRefreshLayout
             if (!TextUtils.isEmpty(response)) {
                 if (response.startsWith("{\"comments\"")) {
                     task.execute(COMMENTS, mType, response);
-                    CommentList commentList = CommentList.parse(response);
+                    Comment.CommentList commentList = Comment.parseList(response);
                     if (commentList != null && commentList.commentList != null) {
                         if (mCommentList != null && mCommentList.size() > 0) {
                             for (int i = commentList.commentList.size() - 1; i >= 0; i--) {
@@ -307,17 +306,17 @@ public class CommentsFragment extends BaseFragment implements SwipeRefreshLayout
                     comment.user.avatar_large, holder.userImage, BaseActivity.UIL_OPTIONS);
 //            OauthUtils.doLinkify(holder.commentText);
             holder.commentCreateAt.setText(TimeUtils
-                    .parseTime(comment.created_at) + "  "
+                    .parseTime(comment.createdAt) + "  "
                     + OauthUtils.splitAndFilterString(comment.source));
-            if (comment.reply_comment != null) {
-                if (!TextUtils.isEmpty(comment.reply_comment.text)) {
+            if (comment.replyComment != null) {
+                if (!TextUtils.isEmpty(comment.replyComment.text)) {
                     try {
-                        StatusUtils.dealStatusText(getActivity(), holder.repostStatusText, comment.reply_comment.text, comment.reply_comment.user.name);
+                        StatusUtils.dealStatusText(getActivity(), holder.repostStatusText, comment.replyComment.text, comment.replyComment.user.name);
 //                        holder.repostStatusText.setText("@"
 //                                + comment.reply_comment.user.name + ":"
 //                                + comment.reply_comment.text);
                     } catch (Exception e) {
-                        holder.repostStatusText.setText(comment.reply_comment.text);
+                        holder.repostStatusText.setText(comment.replyComment.text);
                     }
 //                    OauthUtils.doLinkify(holder.repostStatusText);
 
@@ -332,9 +331,9 @@ public class CommentsFragment extends BaseFragment implements SwipeRefreshLayout
                         holder.repostStatusText.setText(comment.status.text);
                     }
 //                    OauthUtils.doLinkify(holder.repostStatusText);
-                    if (!TextUtils.isEmpty(comment.status.bmiddle_pic)) {
+                    if (!TextUtils.isEmpty(comment.status.bmiddle)) {
                         ImageLoader.getInstance().displayImage
-                                (comment.status.bmiddle_pic, holder.repostImageView, BaseActivity.UIL_OPTIONS);
+                                (comment.status.bmiddle, holder.repostImageView, BaseActivity.UIL_OPTIONS);
                         holder.repostImageView.setVisibility(View.VISIBLE);
                     } else {
                         holder.repostImageView.setVisibility(View.GONE);

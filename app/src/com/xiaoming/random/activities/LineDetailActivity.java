@@ -20,16 +20,15 @@ import com.sina.weibo.sdk.exception.WeiboException;
 import com.sina.weibo.sdk.net.RequestListener;
 import com.sina.weibo.sdk.openapi.CommentsAPI;
 import com.sina.weibo.sdk.openapi.legacy.FriendshipsAPI;
-import com.sina.weibo.sdk.openapi.models.Comment;
-import com.sina.weibo.sdk.openapi.models.CommentList;
 import com.sina.weibo.sdk.openapi.models.ErrorInfo;
-import com.sina.weibo.sdk.openapi.models.Status;
-import com.sina.weibo.sdk.openapi.models.User;
 import com.sina.weibo.sdk.utils.LogUtil;
 import com.xiaoming.random.R;
 import com.xiaoming.random.dao.StatusDao;
 import com.xiaoming.random.fragments.MainTimeLineFragment;
 import com.xiaoming.random.model.AuthUser;
+import com.xiaoming.random.model.Comment;
+import com.xiaoming.random.model.Status;
+import com.xiaoming.random.model.WeiboUser;
 import com.xiaoming.random.utils.OauthUtils;
 import com.xiaoming.random.utils.StatusUtils;
 import com.xiaoming.random.utils.StatusViewHolder;
@@ -70,13 +69,13 @@ public class LineDetailActivity extends BaseActivity implements SwipeRefreshLayo
                 showUserProfile(v);
                 break;
             case R.id.comment_follow_user:
-                User user = (User) v.getTag();
+                WeiboUser user = (WeiboUser) v.getTag();
                 ButtonFlat btn = (ButtonFlat) v;
                 String follow = getResources().getString(R.string.follow);
                 if (btn.getText().equals(follow)) {
-                    mFriendshipsApi.create(Long.parseLong(user.id), user.screen_name, new FriendsListener());
+                    mFriendshipsApi.create(Long.parseLong(user.id), user.screenName, new FriendsListener());
                 } else {
-                    mFriendshipsApi.destroy(Long.parseLong(user.id), user.screen_name, new FriendsListener());
+                    mFriendshipsApi.destroy(Long.parseLong(user.id), user.screenName, new FriendsListener());
                 }
                 break;
 
@@ -167,7 +166,7 @@ public class LineDetailActivity extends BaseActivity implements SwipeRefreshLayo
                 public void onComplete(String response) {
                     if (!TextUtils.isEmpty(response)) {
                         if (response.startsWith("{\"comments\"")) {
-                            CommentList commentList = CommentList.parse(response);
+                            Comment.CommentList commentList = Comment.parseList(response);
                             mStatusDao.saveStaComments(response, mId);
                             if (mCommentList != null && mCommentList.size() > 0) {
                                 for (int i = commentList.commentList.size() - 1; i >= 0; i--) {
@@ -276,7 +275,7 @@ public class LineDetailActivity extends BaseActivity implements SwipeRefreshLayo
 //                holder.mCommentText.setText(comment.text);
                 StatusUtils.dealStatusText(LineDetailActivity.this, holder.mCommentText, comment.text, null);
                 holder.mCommentCreateAt.setText(TimeUtils
-                        .parseTime(comment.created_at) + "  "
+                        .parseTime(comment.createdAt) + "  "
                         + OauthUtils.splitAndFilterString(comment.source));
 //                OauthUtils.doLinkify(holder.mCommentText);
                 if (comment.user.following) {

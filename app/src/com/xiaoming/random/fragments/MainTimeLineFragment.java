@@ -24,9 +24,6 @@ import com.sina.weibo.sdk.openapi.legacy.FavoritesAPI;
 import com.sina.weibo.sdk.openapi.legacy.PlaceAPI;
 import com.sina.weibo.sdk.openapi.legacy.StatusesAPI;
 import com.sina.weibo.sdk.openapi.models.ErrorInfo;
-import com.sina.weibo.sdk.openapi.models.FavoriteList;
-import com.sina.weibo.sdk.openapi.models.Status;
-import com.sina.weibo.sdk.openapi.models.StatusList;
 import com.sina.weibo.sdk.utils.LogUtil;
 import com.xiaoming.random.Constants;
 import com.xiaoming.random.R;
@@ -34,6 +31,8 @@ import com.xiaoming.random.activities.AccountsActivity;
 import com.xiaoming.random.dao.StatusDao;
 import com.xiaoming.random.listener.PauseOnScrollListener;
 import com.xiaoming.random.model.AuthUser;
+import com.xiaoming.random.model.Favorite;
+import com.xiaoming.random.model.Status;
 import com.xiaoming.random.tasks.AsyncSave2DBTask;
 import com.xiaoming.random.utils.OauthUtils;
 import com.xiaoming.random.utils.StatusViewHolder;
@@ -439,7 +438,7 @@ public class MainTimeLineFragment extends BaseFragment implements
                 if (response.startsWith("{\"statuses\"")) {
                     task.execute(STATUS, mType, response);
                     // 调用 StatusList#parse 解析字符串成微博列表对象
-                    StatusList statuses = StatusList.parse(response);
+                    Status.StatusList statuses = Status.parseList(response);
                     if (statuses.statusList != null
                             && statuses.statusList.size() > 0) {
                         // 收藏列表由于没有mSinceId,每次都会返回50条数据，因此add会导致重复
@@ -465,14 +464,13 @@ public class MainTimeLineFragment extends BaseFragment implements
                     task.execute(STATUS, mType, response);
                     mStatusList.clear();
                     // 调用 StatusList#parse 解析字符串成微博列表对象
-                    FavoriteList favoriteList = FavoriteList.parse(response);
+                    Favorite.FavoriteList favoriteList = Favorite.parseList(response);
                     if (favoriteList.favoriteList != null
                             && favoriteList.favoriteList.size() > 0) {
                         // for (Favorite status : favoriteList.favoriteList) {
                         for (int i = favoriteList.favoriteList.size() - 1; i >= 0; i--) {
                             if (favoriteList.favoriteList.get(i).status.user != null)
-                                mStatusList.add(0,
-                                        favoriteList.favoriteList.get(i).status);
+                                mStatusList.add(0,favoriteList.favoriteList.get(i).status);
                         }
                     }
                     if (mStatusList != null && mStatusList.size() > 0) {

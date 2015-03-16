@@ -21,7 +21,6 @@ import com.sina.weibo.sdk.exception.WeiboException;
 import com.sina.weibo.sdk.net.RequestListener;
 import com.sina.weibo.sdk.openapi.legacy.FriendshipsAPI;
 import com.sina.weibo.sdk.openapi.models.ErrorInfo;
-import com.sina.weibo.sdk.openapi.models.User;
 import com.sina.weibo.sdk.utils.LogUtil;
 import com.xiaoming.random.R;
 import com.xiaoming.random.activities.BaseActivity;
@@ -29,6 +28,7 @@ import com.xiaoming.random.activities.UserProfileActivity;
 import com.xiaoming.random.dao.StatusDao;
 import com.xiaoming.random.listener.PauseOnScrollListener;
 import com.xiaoming.random.model.AuthUser;
+import com.xiaoming.random.model.WeiboUser;
 import com.xiaoming.random.tasks.AsyncSave2DBTask;
 import com.xiaoming.random.utils.OauthUtils;
 import com.xiaoming.random.utils.Utils;
@@ -57,7 +57,7 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
     private long mUid;
     private Oauth2AccessToken mAccessToken;
     private FriendshipsAPI mFriendsAPI;
-    private List<User> mCommentList = new ArrayList<>();
+    private List<WeiboUser> mCommentList = new ArrayList<>();
     private RecyclerView mCommentsView;
     private SwipeRefreshLayout swipeLayout;
     private FriendShipListListener mCommentsListListener = new FriendShipListListener();
@@ -208,11 +208,11 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
                             mCommentList.clear();
                             if (mTabPosition == 0) {
                                 for (int i = array.length() - 1; i >= 0; i--) {
-                                    mCommentList.add(0, User.parse(array.optJSONObject(i)));
+                                    mCommentList.add(0, WeiboUser.parse(array.optJSONObject(i)));
                                 }
                             } else {
                                 for (int i = 0; i < array.length(); i++) {
-                                    mCommentList.add(0, User.parse(array.optJSONObject(i)));
+                                    mCommentList.add(0, WeiboUser.parse(array.optJSONObject(i)));
                                 }
                             }
                         }
@@ -255,7 +255,7 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
         }
 
         private void setUpView(ViewHolder holder, int position) {
-            User user = mCommentList.get(position);
+            WeiboUser user = mCommentList.get(position);
             if (!TextUtils.isEmpty(user.name)) {
                 holder.userImage.setTag(user.name);
                 holder.userName.setTag(user.name);
@@ -272,7 +272,7 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
                     holder.cancel.setText(getResources().getString(R.string.follow));
                 holder.userLocation.setText(gender + user.location);
                 holder.userName.setText(user.name);
-                ImageLoader.getInstance().displayImage(user.avatar_large, holder.userImage, BaseActivity.UIL_OPTIONS);
+                ImageLoader.getInstance().displayImage(user.avatarLarge, holder.userImage, BaseActivity.UIL_OPTIONS);
             }
         }
 
@@ -304,12 +304,12 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
                         if (mFriendsAPI == null)
                             initFriendsApi();
                         ButtonFlat btn = (ButtonFlat) v;
-                        User user = (User) v.getTag();
+                        WeiboUser user = (WeiboUser) v.getTag();
                         String follow = getResources().getString(R.string.follow);
                         if (btn.getText().equals(follow)) {
-                            mFriendsAPI.create(Long.parseLong(user.id), user.screen_name, new FriendshipRequestListener());
+                            mFriendsAPI.create(Long.parseLong(user.id), user.screenName, new FriendshipRequestListener());
                         } else {
-                            mFriendsAPI.destroy(Long.parseLong(user.id), user.screen_name, new FriendshipRequestListener());
+                            mFriendsAPI.destroy(Long.parseLong(user.id), user.screenName, new FriendshipRequestListener());
                         }
                     }
                 });
