@@ -101,7 +101,9 @@ public class MainTimeLineFragment extends BaseFragment implements
         int what = msg.what;
         if (what==1&&mStatusAdapter!=null)
             mStatusAdapter.notifyDataSetChanged();
-        if (swipeLayout.isRefreshing())swipeLayout.setRefreshing(false);
+        if (swipeLayout.isRefreshing())
+            setRefreshing(swipeLayout,false);
+//            swipeLayout.setRefreshing(false);
         return true;
     }
 
@@ -208,7 +210,8 @@ public class MainTimeLineFragment extends BaseFragment implements
             }
         } else {
             if (swipeLayout != null) {
-                swipeLayout.setRefreshing(false);
+//                swipeLayout.setRefreshing(false);
+                setRefreshing(swipeLayout,false);
             }
             OauthUtils.showToast(getActivity(), getString(R.string.networkUnavailable));
 

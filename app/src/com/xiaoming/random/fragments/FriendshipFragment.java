@@ -144,7 +144,9 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
         int what = msg.what;
         if (what==1&&mCommentsListAdapter!=null)
             mCommentsListAdapter.notifyDataSetChanged();
-        if (swipeLayout.isRefreshing())swipeLayout.setRefreshing(false);
+        if (swipeLayout.isRefreshing())
+            setRefreshing(swipeLayout,false);
+//            swipeLayout.setRefreshing(false);
         return true;
     }
 

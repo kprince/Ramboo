@@ -86,9 +86,9 @@ public class CommentsFragment extends BaseFragment implements SwipeRefreshLayout
     @Override
     public boolean notifyDataSetChanged(Message msg) {
         int what = msg.what;
-        if (what==1&&mCommentsListAdapter!=null)
-            mCommentsListAdapter.notifyDataSetChanged();
-        if (swipeLayout.isRefreshing())swipeLayout.setRefreshing(false);
+        if (what==1&&mCommentsListAdapter!=null)mCommentsListAdapter.notifyDataSetChanged();
+        if (swipeLayout.isRefreshing())setRefreshing(swipeLayout,false);
+//            swipeLayout.setRefreshing(false);
         return true;
     }
     @Override
@@ -200,15 +200,6 @@ public class CommentsFragment extends BaseFragment implements SwipeRefreshLayout
         if (Constants.DEVELOPER_MODE)
             Debug.stopMethodTracing();
         return mRootView;
-    }
-
-
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-//        getCachedComments();
     }
 
     @Override

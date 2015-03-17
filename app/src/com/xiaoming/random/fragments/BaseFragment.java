@@ -131,12 +131,23 @@ public class BaseFragment extends Fragment {
     }
 
     public void setRefreshing(final SwipeRefreshLayout swipeRefreshLayout, final boolean tf) {
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                swipeRefreshLayout.setRefreshing(tf);
-            }
-        }, 200);
+        if (!tf) {
+            swipeRefreshLayout.setRefreshing(tf);
+            return;
+        }
+        swipeRefreshLayout.setProgressViewOffset(false, 0,
+                (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
+        swipeRefreshLayout.setRefreshing(true);
+//        TypedValue typed_value = new TypedValue();
+//        getActivity().getTheme().resolveAttribute(android.support.v7.appcompat.R.attr.actionBarSize, typed_value, true);
+//        swipeRefreshLayout.setProgressViewOffset(false, 0, getResources().getDimensionPixelSize(typed_value.resourceId));
+//        swipeRefreshLayout.setRefreshing(true);
+//        mHandler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                swipeRefreshLayout.setRefreshing(tf);
+//            }
+//        }, 200);
     }
 
 
