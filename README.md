@@ -8,9 +8,9 @@
 *   缤纷色彩，随心所欲
 *   微博卡片
 
-![ Ramboo](images/menu.png)![ Ramboo](images/home.png)
+![ Ramboo](images/menu.png)    ![ Ramboo](images/home.png)
 
-![ Ramboo](images/friendship.png)![ Ramboo](images/settings.png)
+![ Ramboo](images/friendship.png)    ![ Ramboo](images/settings.png)
 
 # To be countinue   努力的方向
 
