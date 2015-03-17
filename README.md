@@ -12,9 +12,7 @@
 
 ![ Ramboo](images/friendship.png)![ Ramboo](images/settings.png)
 
-# To be countinue
-
-## 努力的方向
+# To be countinue   努力的方向
 
 *   广告过滤（求算法）
 *   GIF、长图（用WebView？缓存咋整，求支招）
