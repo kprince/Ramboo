@@ -7,13 +7,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.xiaoming.random.R;
 import com.xiaoming.random.activities.BaseActivity;
@@ -139,12 +136,12 @@ public class BaseFragment extends Fragment {
             public void run() {
                 swipeRefreshLayout.setRefreshing(tf);
             }
-        }, 100);
+        }, 200);
     }
 
 
     /**
-     * 获取Material Design 的颜色
+     * 获取Material主题的颜色colorPrimary/colorPrimaryDark/colorAccent
      *
      * @param attr Material Design Color attr like R.attr.colorPrimary
      * @return

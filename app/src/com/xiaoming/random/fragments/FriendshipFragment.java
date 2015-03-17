@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,7 +28,6 @@ import com.xiaoming.random.Constants;
 import com.xiaoming.random.R;
 import com.xiaoming.random.activities.BaseActivity;
 import com.xiaoming.random.activities.UserProfileActivity;
-import com.xiaoming.random.dao.StatusDao;
 import com.xiaoming.random.listener.PauseOnScrollListener;
 import com.xiaoming.random.model.AuthUser;
 import com.xiaoming.random.model.WeiboUser;
@@ -142,12 +140,6 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-    }
-
-    @Override
     public boolean notifyDataSetChanged(Message msg) {
         int what = msg.what;
         if (what==1&&mCommentsListAdapter!=null)
@@ -163,6 +155,7 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
      */
     @Override
     public void getCachedContent() {
+
         mCommentList = mDao.getUserList(mType, DEFAULT_COUNT);
         if (mCommentList == null || mCommentList.size() == 0) {
             getUserList();

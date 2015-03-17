@@ -26,7 +26,6 @@ import com.xiaoming.random.R;
 import com.xiaoming.random.activities.AccountsActivity;
 import com.xiaoming.random.activities.BaseActivity;
 import com.xiaoming.random.activities.UserProfileActivity;
-import com.xiaoming.random.dao.StatusDao;
 import com.xiaoming.random.listener.PauseOnScrollListener;
 import com.xiaoming.random.model.AuthUser;
 import com.xiaoming.random.model.Comment;
@@ -196,7 +195,7 @@ public class CommentsFragment extends BaseFragment implements SwipeRefreshLayout
         mCommentsListView.setLayoutManager(mLayoutManager);
         swipeLayout.setOnRefreshListener(this);
         Utils.setSwipeRefreshColorSchema(swipeLayout);
-        setRefreshing(swipeLayout,true);
+        setRefreshing(swipeLayout, true);
         newGetCacheTask();
         if (Constants.DEVELOPER_MODE)
             Debug.stopMethodTracing();
