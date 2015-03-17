@@ -33,7 +33,7 @@ public class AsyncSave2DBTask extends AsyncTask<String, Integer, Boolean> {
     protected Boolean doInBackground(String... params) {
         if (params == null & params.length < 3)
             throw new RuntimeException("params is null");
-        mDao = new StatusDao(mContext);
+        mDao = new StatusDao();
         mObjectType = params[0];
         mType = params[1];
         mWhat = params[2];

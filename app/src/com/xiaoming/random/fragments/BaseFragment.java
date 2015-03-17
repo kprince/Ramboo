@@ -5,18 +5,32 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.xiaoming.random.R;
 import com.xiaoming.random.activities.BaseActivity;
+import com.xiaoming.random.dao.StatusDao;
 import com.xiaoming.random.utils.Utils;
 
 public class BaseFragment extends Fragment {
     protected static final String SCREEN_NAME = "SCREEN_NAME";
     private static final String TAG = "BaseFragment";
-    protected Handler handler = new Handler();
+    protected StatusDao mDao;
+    protected View mRootView;
+    protected Handler mHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            return notifyDataSetChanged(msg);
+        }
+    });
 
     /**
      * 获取用户偏好设置
@@ -37,6 +51,16 @@ public class BaseFragment extends Fragment {
         setRetainInstance(true);
         String themeColor = getUserPref().getString(BaseActivity.SF_THEME_COLOR, "Teal");
         setThemeColor(themeColor);
+        mDao = new StatusDao();
+    }
+
+
+    /**
+     *
+     * @param msg
+     */
+    public boolean notifyDataSetChanged(Message msg){
+       return false;
     }
 
     /**
@@ -85,17 +109,37 @@ public class BaseFragment extends Fragment {
         }
     }
 
+    /**
+     * 开启线程读取缓存到数据库的内容
+     */
+    public void newGetCacheTask(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                getCachedContent();
+            }
+        }).start();
+    }
+
+    /**
+     * 获取缓存的内容
+     */
+    public void getCachedContent(){
+
+    }
+
     public boolean checkNetwork() {
         return Utils.detect(getActivity());
     }
 
     public void setRefreshing(final SwipeRefreshLayout swipeRefreshLayout, final boolean tf) {
-        handler.postDelayed(new Runnable() {
+        mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 swipeRefreshLayout.setRefreshing(tf);
             }
-        }, 400);
+        }, 100);
     }
 
 

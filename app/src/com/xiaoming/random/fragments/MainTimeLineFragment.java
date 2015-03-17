@@ -6,6 +6,11 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Debug;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,9 +29,6 @@ import com.sina.weibo.sdk.openapi.legacy.FavoritesAPI;
 import com.sina.weibo.sdk.openapi.legacy.PlaceAPI;
 import com.sina.weibo.sdk.openapi.legacy.StatusesAPI;
 import com.sina.weibo.sdk.openapi.models.ErrorInfo;
-import com.sina.weibo.sdk.openapi.models.FavoriteList;
-import com.sina.weibo.sdk.openapi.models.Status;
-import com.sina.weibo.sdk.openapi.models.StatusList;
 import com.sina.weibo.sdk.utils.LogUtil;
 import com.xiaoming.random.Constants;
 import com.xiaoming.random.R;
@@ -34,6 +36,8 @@ import com.xiaoming.random.activities.AccountsActivity;
 import com.xiaoming.random.dao.StatusDao;
 import com.xiaoming.random.listener.PauseOnScrollListener;
 import com.xiaoming.random.model.AuthUser;
+import com.xiaoming.random.model.Favorite;
+import com.xiaoming.random.model.Status;
 import com.xiaoming.random.tasks.AsyncSave2DBTask;
 import com.xiaoming.random.utils.OauthUtils;
 import com.xiaoming.random.utils.StatusViewHolder;
@@ -58,7 +62,6 @@ public class MainTimeLineFragment extends BaseFragment implements
     private static final int STATUS_DEFAULT_LENGTH = 50;
     protected final String TAG = "MainTimeLineFragment";
     private int mTabPosition;
-//    private long mMaxId = 0;
     private long mSinceId = 0;
     private long mUid;
     private Oauth2AccessToken mAccessToken;
@@ -74,9 +77,9 @@ public class MainTimeLineFragment extends BaseFragment implements
     private double mLongitude = 0.0;
     private int mAtFlag;
     private String mScreenName;
-    private StatusDao mStatusDao;
     private RecyclerView.LayoutManager mLayoutManager;
     private RandomButtonFloat mBack2Top;
+    private View mRootView;
 
     public static MainTimeLineFragment newInstance(String screenName, int position, int atFlag) {
         MainTimeLineFragment fragment = new MainTimeLineFragment();
@@ -97,6 +100,14 @@ public class MainTimeLineFragment extends BaseFragment implements
         super.onSaveInstanceState(outState);
     }
 
+    @Override
+       public boolean notifyDataSetChanged(Message msg) {
+        int what = msg.what;
+        if (what==1&&mStatusAdapter!=null)
+            mStatusAdapter.notifyDataSetChanged();
+        if (swipeLayout.isRefreshing())swipeLayout.setRefreshing(false);
+        return true;
+    }
 
     /**
      * 点击收藏按钮时触发刷新列表
@@ -108,9 +119,6 @@ public class MainTimeLineFragment extends BaseFragment implements
             swipeLayout.setRefreshing(true);
         onRefresh();
     }
-
-
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -128,26 +136,27 @@ public class MainTimeLineFragment extends BaseFragment implements
             mSinceId = 0l;
         }
 //        mMaxId = 0;
-        mStatusDao = new StatusDao(getActivity());
         initStatusType();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.main_time_line_layout,
+        if (Constants.DEVELOPER_MODE)
+            Debug.startMethodTracing(TAG);
+         mRootView = inflater.inflate(R.layout.main_time_line_layout,
                 container, false);
-        swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh);
+        swipeLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.swipe_refresh);
         swipeLayout.setOnRefreshListener(this);
         Utils.setSwipeRefreshColorSchema(swipeLayout);
-        mStatusListView = (RecyclerView) rootView.findViewById(R.id.main_time_line);
+        mStatusListView = (RecyclerView) mRootView.findViewById(R.id.main_time_line);
         mLayoutManager = new LinearLayoutManager(getActivity());
         mStatusListView.setLayoutManager(mLayoutManager);
         mStatusAdapter = new StatusAdapter();
         mStatusListView.setAdapter(mStatusAdapter);
         //      ImageLoader滑动停止加载图片
         mStatusListView.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), true));
-        mBack2Top = (RandomButtonFloat) rootView.findViewById(R.id.back_to_top);
+        mBack2Top = (RandomButtonFloat) mRootView.findViewById(R.id.back_to_top);
         mBack2Top.setBackgroundColor(getColor(R.attr.colorAccent));
         mBack2Top.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,16 +164,19 @@ public class MainTimeLineFragment extends BaseFragment implements
                 mLayoutManager.scrollToPosition(0);
             }
         });
-        getCachedStatus();
-        return rootView;
+        setRefreshing(swipeLayout, true);
+        newGetCacheTask();
+        if (Constants.DEVELOPER_MODE)
+            Debug.stopMethodTracing();
+        return mRootView;
     }
+
 
     private void initToken() {
         if (mAccessToken == null) {
             long uid = getUserID();
             if (uid > 0) {
-                StatusDao dao = new StatusDao(getActivity());
-                AuthUser user = dao.getAuthUser(uid);
+                AuthUser user = mDao.getAuthUser(uid);
                 mAccessToken = new Oauth2AccessToken(user.token, user.expires);
             }
         }
@@ -173,16 +185,15 @@ public class MainTimeLineFragment extends BaseFragment implements
     /**
      * 获取缓存的微博列表
      */
-    public void getCachedStatus() {
-        setRefreshing(swipeLayout,true);
-        mSinceId = mStatusDao.getSinceId(STATUS, mType);
-        mStatusList = mStatusDao.readStatus(STATUS_DEFAULT_LENGTH, mType);
-        if (mStatusList == null || mStatusList.size() <= 0) {
+    @Override
+    public void getCachedContent() {
+//        setRefreshing(swipeLayout,true);
+        mSinceId = mDao.getSinceId(STATUS, mType);
+        mStatusList = mDao.readStatus(STATUS_DEFAULT_LENGTH, mType);
+        if (mStatusList == null || mStatusList.size() <= 0)
             getTimeLine();
-        } else {
-            mStatusAdapter.notifyDataSetChanged();
-            setRefreshing(swipeLayout, false);
-        }
+        else
+            mHandler.sendEmptyMessage(1);
     }
 
     /**
@@ -402,7 +413,7 @@ public class MainTimeLineFragment extends BaseFragment implements
                     .inflate(R.layout.status_layout, parent, false);
             StatusViewHolder holder = new StatusViewHolder(view);
             initToken();
-            holder.setContext(getActivity(), mAccessToken, MainTimeLineFragment.this);
+            holder.setContext(mAccessToken, MainTimeLineFragment.this);
             return holder;
         }
 
@@ -439,7 +450,7 @@ public class MainTimeLineFragment extends BaseFragment implements
                 if (response.startsWith("{\"statuses\"")) {
                     task.execute(STATUS, mType, response);
                     // 调用 StatusList#parse 解析字符串成微博列表对象
-                    StatusList statuses = StatusList.parse(response);
+                    Status.StatusList statuses = Status.parseList(response);
                     if (statuses.statusList != null
                             && statuses.statusList.size() > 0) {
                         // 收藏列表由于没有mSinceId,每次都会返回50条数据，因此add会导致重复
@@ -465,14 +476,13 @@ public class MainTimeLineFragment extends BaseFragment implements
                     task.execute(STATUS, mType, response);
                     mStatusList.clear();
                     // 调用 StatusList#parse 解析字符串成微博列表对象
-                    FavoriteList favoriteList = FavoriteList.parse(response);
+                    Favorite.FavoriteList favoriteList = Favorite.parseList(response);
                     if (favoriteList.favoriteList != null
                             && favoriteList.favoriteList.size() > 0) {
                         // for (Favorite status : favoriteList.favoriteList) {
                         for (int i = favoriteList.favoriteList.size() - 1; i >= 0; i--) {
                             if (favoriteList.favoriteList.get(i).status.user != null)
-                                mStatusList.add(0,
-                                        favoriteList.favoriteList.get(i).status);
+                                mStatusList.add(0,favoriteList.favoriteList.get(i).status);
                         }
                     }
                     if (mStatusList != null && mStatusList.size() > 0) {

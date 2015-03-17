@@ -20,16 +20,15 @@ import com.sina.weibo.sdk.exception.WeiboException;
 import com.sina.weibo.sdk.net.RequestListener;
 import com.sina.weibo.sdk.openapi.CommentsAPI;
 import com.sina.weibo.sdk.openapi.legacy.FriendshipsAPI;
-import com.sina.weibo.sdk.openapi.models.Comment;
-import com.sina.weibo.sdk.openapi.models.CommentList;
 import com.sina.weibo.sdk.openapi.models.ErrorInfo;
-import com.sina.weibo.sdk.openapi.models.Status;
-import com.sina.weibo.sdk.openapi.models.User;
 import com.sina.weibo.sdk.utils.LogUtil;
 import com.xiaoming.random.R;
 import com.xiaoming.random.dao.StatusDao;
 import com.xiaoming.random.fragments.MainTimeLineFragment;
 import com.xiaoming.random.model.AuthUser;
+import com.xiaoming.random.model.Comment;
+import com.xiaoming.random.model.Status;
+import com.xiaoming.random.model.WeiboUser;
 import com.xiaoming.random.utils.OauthUtils;
 import com.xiaoming.random.utils.StatusUtils;
 import com.xiaoming.random.utils.StatusViewHolder;
@@ -41,16 +40,15 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class LineDetailActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener,
         View.OnClickListener {
-    private static String TAG = "TimeLineDetailActivity";
-    private static String STA_COMMENTS = "STA_COMMENTS";
-    private static int DEFAULT_LENGTH = 100;
+    private static final String TAG = "TimeLineDetailActivity";
+    private static final String STA_COMMENTS = "STA_COMMENTS";
+    private static final int DEFAULT_LENGTH = 100;
     private ListView mCommentsListView;
     private Status mStatus;
     private List<Comment> mCommentList;
     private Oauth2AccessToken mAccessToken;
     private long mId;
     private CommentListAdapter mCommentListAdapter = new CommentListAdapter();
-    private StatusDao mStatusDao;
     private long mSinceId;
     private SwipeRefreshLayout mRefresh;
     private FriendshipsAPI mFriendshipsApi;
@@ -70,13 +68,13 @@ public class LineDetailActivity extends BaseActivity implements SwipeRefreshLayo
                 showUserProfile(v);
                 break;
             case R.id.comment_follow_user:
-                User user = (User) v.getTag();
+                WeiboUser user = (WeiboUser) v.getTag();
                 ButtonFlat btn = (ButtonFlat) v;
                 String follow = getResources().getString(R.string.follow);
                 if (btn.getText().equals(follow)) {
-                    mFriendshipsApi.create(Long.parseLong(user.id), user.screen_name, new FriendsListener());
+                    mFriendshipsApi.create(Long.parseLong(user.id), user.screenName, new FriendsListener());
                 } else {
-                    mFriendshipsApi.destroy(Long.parseLong(user.id), user.screen_name, new FriendsListener());
+                    mFriendshipsApi.destroy(Long.parseLong(user.id), user.screenName, new FriendsListener());
                 }
                 break;
 
@@ -109,24 +107,23 @@ public class LineDetailActivity extends BaseActivity implements SwipeRefreshLayo
                 R.color.teal_a400, R.color.purple_a400,
                 R.color.indigo_a400
         );
-
         mStatus = (Status) getIntent().getExtras().get(MainTimeLineFragment.STATUS);
         mId = Long.parseLong(mStatus.mid);
-        mStatusDao = new StatusDao(this);
+        mDao = new StatusDao();
         setUpListView();
         getCachedComments();
     }
 
     private void getCachedComments() {
         try {
-            mCommentList = mStatusDao.readStaComments(DEFAULT_LENGTH, mId);
+            mCommentList = mDao.readStaComments(DEFAULT_LENGTH, mId);
         } catch (Exception e) {
             e.printStackTrace();
         }
         if (mCommentList != null && mCommentList.size() > 0) {
             mCommentListAdapter.notifyDataSetChanged();
         } else {
-            mSinceId = mStatusDao.getStaCommSinId(STA_COMMENTS, mId);
+            mSinceId = mDao.getStaCommSinId(STA_COMMENTS, mId);
             requestCommentsList();
         }
     }
@@ -135,8 +132,8 @@ public class LineDetailActivity extends BaseActivity implements SwipeRefreshLayo
         if (mAccessToken == null) {
             long uid = getUserID();
             if (uid > 0) {
-                StatusDao dao = new StatusDao(this);
-                AuthUser user = dao.getAuthUser(uid);
+                initDao();
+                AuthUser user = mDao.getAuthUser(uid);
                 mAccessToken = new Oauth2AccessToken(user.token, user.expires);
             }
         }
@@ -148,6 +145,11 @@ public class LineDetailActivity extends BaseActivity implements SwipeRefreshLayo
                     AccountsActivity.class);
             startActivity(oauthIntent);
         }
+    }
+
+    private void initDao() {
+        if (mDao==null)
+            mDao = new StatusDao();
     }
 
     private void requestCommentsList() {
@@ -167,8 +169,8 @@ public class LineDetailActivity extends BaseActivity implements SwipeRefreshLayo
                 public void onComplete(String response) {
                     if (!TextUtils.isEmpty(response)) {
                         if (response.startsWith("{\"comments\"")) {
-                            CommentList commentList = CommentList.parse(response);
-                            mStatusDao.saveStaComments(response, mId);
+                            Comment.CommentList commentList = Comment.parseList(response);
+                            mDao.saveStaComments(response, mId);
                             if (mCommentList != null && mCommentList.size() > 0) {
                                 for (int i = commentList.commentList.size() - 1; i >= 0; i--) {
                                     mCommentList.add(0, commentList.commentList.get(i));
@@ -195,7 +197,7 @@ public class LineDetailActivity extends BaseActivity implements SwipeRefreshLayo
         View headerView = View.inflate(this, R.layout.status_layout, null);
         StatusViewHolder holder = new StatusViewHolder(headerView);
         initToken();
-        holder.setContext(this, mAccessToken, null);
+        holder.setContext(mAccessToken, null);
         holder.buildStatusItemView(mStatus, getColor(R.attr.colorPrimary));
         mCommentsListView.addHeaderView(headerView);
         mCommentsListView.setHeaderDividersEnabled(false);
@@ -276,7 +278,7 @@ public class LineDetailActivity extends BaseActivity implements SwipeRefreshLayo
 //                holder.mCommentText.setText(comment.text);
                 StatusUtils.dealStatusText(LineDetailActivity.this, holder.mCommentText, comment.text, null);
                 holder.mCommentCreateAt.setText(TimeUtils
-                        .parseTime(comment.created_at) + "  "
+                        .parseTime(comment.createdAt) + "  "
                         + OauthUtils.splitAndFilterString(comment.source));
 //                OauthUtils.doLinkify(holder.mCommentText);
                 if (comment.user.following) {

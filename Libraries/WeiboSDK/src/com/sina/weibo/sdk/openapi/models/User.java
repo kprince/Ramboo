@@ -115,15 +115,13 @@ public class User implements Serializable{
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        
         return null;
     }
-    
+
     public static User parse(JSONObject jsonObject) {
         if (null == jsonObject) {
             return null;
         }
-        
         User user = new User();
         user.id                 = jsonObject.optString("id", "");
         user.idstr              = jsonObject.optString("idstr", "");

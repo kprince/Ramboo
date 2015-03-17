@@ -8,14 +8,15 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.sina.weibo.sdk.auth.Oauth2AccessToken;
-import com.sina.weibo.sdk.openapi.models.Comment;
-import com.sina.weibo.sdk.openapi.models.Status;
-import com.sina.weibo.sdk.openapi.models.User;
+import com.xiaoming.random.RandomApplication;
 import com.xiaoming.random.activities.BaseActivity;
 import com.xiaoming.random.fragments.MainTimeLineFragment;
 import com.xiaoming.random.fragments.UserProfileFragment;
 import com.xiaoming.random.model.AuthUser;
+import com.xiaoming.random.model.Comment;
 import com.xiaoming.random.model.Emotion;
+import com.xiaoming.random.model.Status;
+import com.xiaoming.random.model.WeiboUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,13 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StatusDao {
-    private UserSQLiteDBHelper mHelper;
+    private SQLiteDatabaseHelper mHelper;
     private long mAuthUserID;
 
-    public StatusDao(Context context) {
-//        System.out.println(context==null);
-        mHelper = new UserSQLiteDBHelper(context);
-        mAuthUserID = getAuthUserID(context);
+    public StatusDao() {
+        mHelper = SQLiteDatabaseHelper.getInstance();
+        mAuthUserID = getAuthUserID(RandomApplication.getContext());
     }
 
     /**
@@ -43,7 +43,7 @@ public class StatusDao {
         SQLiteDatabase db = mHelper.getReadableDatabase();
         String path = db.getPath();
         mHelper.getReadableDatabase().getPath();
-        db.close();
+        //db.close();
         return path;
     }
 
@@ -70,7 +70,7 @@ public class StatusDao {
         db.execSQL("delete from user");
         db.setTransactionSuccessful();
         db.endTransaction();
-        db.close();
+        //db.close();
     }
 
     /**
@@ -92,7 +92,7 @@ public class StatusDao {
         } catch (JSONException e) {
             e.printStackTrace();
         } finally {
-            db.close();
+            //db.close();
         }
     }
 
@@ -104,7 +104,7 @@ public class StatusDao {
             result.add(cursor.getString(0));
         }
         cursor.close();
-        db.close();
+        //db.close();
         return result;
     }
 
@@ -123,11 +123,11 @@ public class StatusDao {
             values.put("token", token.getToken());
             values.put("expires", token.getExpiresTime());
             db.replace("auth_user", null, values);
-            db.close();
+            //db.close();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            db.close();
+            //db.close();
         }
     }
 
@@ -147,7 +147,7 @@ public class StatusDao {
             try {
                 JSONObject obj = new JSONObject(cursor.getString(cursor
                         .getColumnIndex("user_str")));
-                user = new AuthUser(User.parse(obj));
+                user = new AuthUser(WeiboUser.parse(obj));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -156,7 +156,7 @@ public class StatusDao {
             list.add(user);
         }
         cursor.close();
-        db.close();
+        //db.close();
         return list;
     }
 
@@ -169,7 +169,7 @@ public class StatusDao {
         SQLiteDatabase db = mHelper.getWritableDatabase();
         try {
             JSONObject json = new JSONObject(userStr);
-            User user = User.parse(json);
+            WeiboUser user = WeiboUser.parse(json);
             db.beginTransaction();
             db.execSQL("delete from user where auth_id = " + mAuthUserID + " and name = '" + user.name + "' and type ='USER'");
             ContentValues values = new ContentValues();
@@ -184,10 +184,9 @@ public class StatusDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            db.close();
+            //db.close();
         }
     }
-
     /**
      * 保存关注列表中的User
      *
@@ -206,7 +205,7 @@ public class StatusDao {
                 for (int i = 0; i < array.length(); i++) {
                     ContentValues values = new ContentValues();
                     JSONObject obj = array.optJSONObject(i);
-                    User user = User.parse(obj);
+                    WeiboUser user = WeiboUser.parse(obj);
                     values.put("id", user.id);
                     values.put("user_str", array.get(i).toString());
                     values.put("type", type);
@@ -220,7 +219,7 @@ public class StatusDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            db.close();
+            //db.close();
         }
     }
 
@@ -230,8 +229,8 @@ public class StatusDao {
      * @param
      * @return
      */
-    public User getUserByName(String name, String type) {
-        User user = null;
+    public WeiboUser getUserByName(String name, String type) {
+        WeiboUser user = null;
         SQLiteDatabase db = mHelper.getWritableDatabase();
         Cursor cursor = db.rawQuery(
                 "select id ,user_str from user where auth_id = " + mAuthUserID + " and type = '" + type + "' and name =  '" + name + "'", null);
@@ -239,14 +238,14 @@ public class StatusDao {
             try {
                 JSONObject obj = new JSONObject(cursor.getString(cursor
                         .getColumnIndex("user_str")));
-                user = User.parse(obj);
+                user = WeiboUser.parse(obj);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
         }
         cursor.close();
-        db.close();
+        //db.close();
         return user;
     }
 
@@ -256,8 +255,8 @@ public class StatusDao {
      * @param id
      * @return
      */
-    public User getUserById(Long id) {
-        User user = null;
+    public WeiboUser getUserById(Long id) {
+        WeiboUser user = null;
         SQLiteDatabase db = mHelper.getWritableDatabase();
         Cursor cursor = db.rawQuery(
                 "select id ,user_str from user where auth_id = " + mAuthUserID + " and id =  " + id, null);
@@ -265,14 +264,14 @@ public class StatusDao {
             try {
                 JSONObject obj = new JSONObject(cursor.getString(cursor
                         .getColumnIndex("user_str")));
-                user = User.parse(obj);
+                user = WeiboUser.parse(obj);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
         }
         cursor.close();
-        db.close();
+        //db.close();
         return user;
     }
 
@@ -281,9 +280,9 @@ public class StatusDao {
      *
      * @return
      */
-    public List<User> getUserList(String type, int length) {
-        List<User> list = new ArrayList<>();
-        User user = null;
+    public List<WeiboUser> getUserList(String type, int length) {
+        List<WeiboUser> list = new ArrayList<>();
+        WeiboUser user = null;
         SQLiteDatabase db = mHelper.getWritableDatabase();
         Cursor cursor = db.rawQuery(
                 "select user_str from user where auth_id = " + mAuthUserID + " and type = '" + type + "' limit  " + length, null);
@@ -291,14 +290,14 @@ public class StatusDao {
             try {
                 JSONObject obj = new JSONObject(cursor.getString(cursor
                         .getColumnIndex("user_str")));
-                user = User.parse(obj);
+                user = WeiboUser.parse(obj);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             list.add(user);
         }
         cursor.close();
-        db.close();
+        //db.close();
         return list;
     }
 
@@ -318,7 +317,7 @@ public class StatusDao {
             try {
                 JSONObject obj = new JSONObject(cursor.getString(cursor
                         .getColumnIndex("user_str")));
-                user = new AuthUser(User.parse(obj));
+                user = new AuthUser(WeiboUser.parse(obj));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -327,7 +326,7 @@ public class StatusDao {
 
         }
         cursor.close();
-        db.close();
+        //db.close();
         return user;
     }
 
@@ -377,7 +376,7 @@ public class StatusDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            db.close();
+            //db.close();
         }
     }
 
@@ -404,11 +403,11 @@ public class StatusDao {
                 values.put("comments_str", status);
                 db.replace("comments", null, values);
             }
-            db.close();
+            //db.close();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            db.close();
+            //db.close();
         }
     }
 
@@ -433,11 +432,11 @@ public class StatusDao {
                 values.put("auth_id", mAuthUserID);
                 db.replace("sta_comments", null, values);
             }
-            db.close();
+            //db.close();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            db.close();
+            //db.close();
         }
 
     }
@@ -456,7 +455,7 @@ public class StatusDao {
             sinceId = cursor.getLong(cursor.getColumnIndex("id"));
         }
         cursor.close();
-        db.close();
+        //db.close();
         return sinceId;
     }
 
@@ -474,7 +473,7 @@ public class StatusDao {
             sinceId = cursor.getLong(cursor.getColumnIndex("id"));
         }
         cursor.close();
-        db.close();
+        //db.close();
         return sinceId;
     }
 
@@ -497,7 +496,7 @@ public class StatusDao {
                 staList.add(status);
         }
         cursor.close();
-        db.close();
+        //db.close();
         return staList;
     }
 
@@ -520,7 +519,7 @@ public class StatusDao {
             staList.add(comment);
         }
         cursor.close();
-        db.close();
+        //db.close();
         return staList;
     }
 
@@ -544,7 +543,7 @@ public class StatusDao {
             staList.add(comment);
         }
         cursor.close();
-        db.close();
+        //db.close();
         return staList;
     }
 }

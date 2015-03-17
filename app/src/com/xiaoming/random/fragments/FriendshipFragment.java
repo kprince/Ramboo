@@ -2,6 +2,9 @@ package com.xiaoming.random.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Debug;
+import android.os.Message;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,14 +24,15 @@ import com.sina.weibo.sdk.exception.WeiboException;
 import com.sina.weibo.sdk.net.RequestListener;
 import com.sina.weibo.sdk.openapi.legacy.FriendshipsAPI;
 import com.sina.weibo.sdk.openapi.models.ErrorInfo;
-import com.sina.weibo.sdk.openapi.models.User;
 import com.sina.weibo.sdk.utils.LogUtil;
+import com.xiaoming.random.Constants;
 import com.xiaoming.random.R;
 import com.xiaoming.random.activities.BaseActivity;
 import com.xiaoming.random.activities.UserProfileActivity;
 import com.xiaoming.random.dao.StatusDao;
 import com.xiaoming.random.listener.PauseOnScrollListener;
 import com.xiaoming.random.model.AuthUser;
+import com.xiaoming.random.model.WeiboUser;
 import com.xiaoming.random.tasks.AsyncSave2DBTask;
 import com.xiaoming.random.utils.OauthUtils;
 import com.xiaoming.random.utils.Utils;
@@ -57,13 +61,12 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
     private long mUid;
     private Oauth2AccessToken mAccessToken;
     private FriendshipsAPI mFriendsAPI;
-    private List<User> mCommentList = new ArrayList<>();
+    private List<WeiboUser> mCommentList = new ArrayList<>();
     private RecyclerView mCommentsView;
     private SwipeRefreshLayout swipeLayout;
     private FriendShipListListener mCommentsListListener = new FriendShipListListener();
     private FriendShipListAdapter mCommentsListAdapter = new FriendShipListAdapter();
     private String mType;
-    private StatusDao mDao;
     private ButtonFloat mSendBtn;
 
 
@@ -95,7 +98,6 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
             mTabPosition = bundle.getInt(POSITION);
         }
         initFriendsType();
-        mDao = new StatusDao(getActivity());
     }
 
     private void initFriendsType() {
@@ -114,17 +116,17 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.main_time_line_layout, container, false);
-        mCommentsView = (RecyclerView) rootView.findViewById(R.id.main_time_line);
+        if (Constants.DEVELOPER_MODE)
+            Debug.startMethodTracing(TAG);
+        mRootView = inflater.inflate(R.layout.main_time_line_layout, container, false);
+        mCommentsView = (RecyclerView) mRootView.findViewById(R.id.main_time_line);
         mCommentsView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mCommentsView.setAdapter(mCommentsListAdapter);
         mCommentsView.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), true));
-        swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh);
-        setRefreshing(swipeLayout,true);
+        swipeLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.swipe_refresh);
         swipeLayout.setOnRefreshListener(this);
         Utils.setSwipeRefreshColorSchema(swipeLayout);
-        getCachedUsers();
-        mSendBtn = (ButtonFloat) rootView.findViewById(R.id.back_to_top);
+        mSendBtn = (ButtonFloat) mRootView.findViewById(R.id.back_to_top);
         mSendBtn.setBackgroundColor(getColor(R.attr.colorAccent));
         mSendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,7 +134,26 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
                 mCommentsView.getLayoutManager().scrollToPosition(0);
             }
         });
-        return rootView;
+        setRefreshing(swipeLayout, true);
+        newGetCacheTask();
+        if (Constants.DEVELOPER_MODE)
+            Debug.stopMethodTracing();
+        return mRootView;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+    }
+
+    @Override
+    public boolean notifyDataSetChanged(Message msg) {
+        int what = msg.what;
+        if (what==1&&mCommentsListAdapter!=null)
+            mCommentsListAdapter.notifyDataSetChanged();
+        if (swipeLayout.isRefreshing())swipeLayout.setRefreshing(false);
+        return true;
     }
 
     /**
@@ -140,13 +161,13 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
      *
      * @return
      */
-    private void getCachedUsers() {
+    @Override
+    public void getCachedContent() {
         mCommentList = mDao.getUserList(mType, DEFAULT_COUNT);
         if (mCommentList == null || mCommentList.size() == 0) {
             getUserList();
         } else {
-            mCommentsListAdapter.notifyDataSetChanged();
-            setRefreshing(swipeLayout, false);
+            mHandler.sendEmptyMessage(1);
         }
     }
 
@@ -208,11 +229,11 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
                             mCommentList.clear();
                             if (mTabPosition == 0) {
                                 for (int i = array.length() - 1; i >= 0; i--) {
-                                    mCommentList.add(0, User.parse(array.optJSONObject(i)));
+                                    mCommentList.add(0, WeiboUser.parse(array.optJSONObject(i)));
                                 }
                             } else {
                                 for (int i = 0; i < array.length(); i++) {
-                                    mCommentList.add(0, User.parse(array.optJSONObject(i)));
+                                    mCommentList.add(0, WeiboUser.parse(array.optJSONObject(i)));
                                 }
                             }
                         }
@@ -255,10 +276,10 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
         }
 
         private void setUpView(ViewHolder holder, int position) {
-            User user = mCommentList.get(position);
+            WeiboUser user = mCommentList.get(position);
             if (!TextUtils.isEmpty(user.name)) {
-                holder.userImage.setTag(user.name);
-                holder.userName.setTag(user.name);
+                holder.userImage.setTag(user);
+                holder.userName.setTag(user);
                 holder.userDesc.setText(user.description);
                 String gender;
                 if (user.gender.equals("n")) {
@@ -272,7 +293,7 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
                     holder.cancel.setText(getResources().getString(R.string.follow));
                 holder.userLocation.setText(gender + user.location);
                 holder.userName.setText(user.name);
-                ImageLoader.getInstance().displayImage(user.avatar_large, holder.userImage, BaseActivity.UIL_OPTIONS);
+                ImageLoader.getInstance().displayImage(user.avatarLarge, holder.userImage, BaseActivity.UIL_OPTIONS);
             }
         }
 
@@ -304,12 +325,12 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
                         if (mFriendsAPI == null)
                             initFriendsApi();
                         ButtonFlat btn = (ButtonFlat) v;
-                        User user = (User) v.getTag();
+                        WeiboUser user = (WeiboUser) v.getTag();
                         String follow = getResources().getString(R.string.follow);
                         if (btn.getText().equals(follow)) {
-                            mFriendsAPI.create(Long.parseLong(user.id), user.screen_name, new FriendshipRequestListener());
+                            mFriendsAPI.create(Long.parseLong(user.id), user.screenName, new FriendshipRequestListener());
                         } else {
-                            mFriendsAPI.destroy(Long.parseLong(user.id), user.screen_name, new FriendshipRequestListener());
+                            mFriendsAPI.destroy(Long.parseLong(user.id), user.screenName, new FriendshipRequestListener());
                         }
                     }
                 });
@@ -320,7 +341,9 @@ public class FriendshipFragment extends BaseFragment implements SwipeRefreshLayo
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), UserProfileActivity.class);
-                intent.putExtra(SCREEN_NAME, v.getTag().toString());
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(UserProfileFragment.USER,(WeiboUser)v.getTag());
+                intent.putExtras(bundle);
                 startActivity(intent);
             }
         }

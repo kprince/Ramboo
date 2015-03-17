@@ -36,7 +36,7 @@ public class AsyncGetEmotionsTask extends AsyncTask {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        StatusDao dao = new StatusDao(mContext);
+                        StatusDao dao = new StatusDao();
                         dao.saveEmotions(s);
                     }
                 }).start();

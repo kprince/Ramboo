@@ -31,7 +31,6 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
     private TextView mCachedImgTxt, mCachedImgPath, mCachedContent, mCachedContentPath,
             mExpCardTxt, mExpCardPath;
     private ImageView mCachedImgDel, mCachedContentDel, mExpCardDel;
-    private StatusDao mDao;
     private ButtonRectangle mBtnOne, mBtnTwo, mBtnThree, mBtnFour, mBtnFive, mBtnSix, mBtnSeven, mBtnEight;
 
 
@@ -51,7 +50,6 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        mDao = new StatusDao(getActivity());
         super.onCreate(savedInstanceState);
     }
 

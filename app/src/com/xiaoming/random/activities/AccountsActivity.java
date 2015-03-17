@@ -27,11 +27,11 @@ import com.sina.weibo.sdk.exception.WeiboException;
 import com.sina.weibo.sdk.net.RequestListener;
 import com.sina.weibo.sdk.openapi.UsersAPI;
 import com.sina.weibo.sdk.openapi.models.ErrorInfo;
-import com.sina.weibo.sdk.openapi.models.User;
 import com.xiaoming.random.Constants;
 import com.xiaoming.random.R;
 import com.xiaoming.random.dao.StatusDao;
 import com.xiaoming.random.model.AuthUser;
+import com.xiaoming.random.model.WeiboUser;
 import com.xiaoming.random.tasks.AsyncGetEmotionsTask;
 import com.xiaoming.random.utils.OauthUtils;
 
@@ -44,7 +44,7 @@ public class AccountsActivity extends BaseActivity {
     private ListView mAccountList;
     // private Oauth2AccessToken mAccessToken;
     private UsersAPI mUsersAPI;
-    private User mUser;
+    private AuthUser mUser;
     private List<AuthUser> mUserList = new ArrayList<AuthUser>();
     private AccountListAdapter mUserListAdapter = new AccountListAdapter();
     private Toolbar mToolbar;
@@ -59,14 +59,14 @@ public class AccountsActivity extends BaseActivity {
         public void onComplete(String response) {
             if (!TextUtils.isEmpty(response)) {
                 mStatusDao.saveAuthUser(response, mToken);
-                User user = User.parse(response);
+                WeiboUser user = WeiboUser.parse(response);
                 Intent mtlIntent = new Intent(AccountsActivity.this,
                         AppMainActivity.class);
                 SharedPreferences sp = getUserPref();
                 Editor editor = sp.edit();
                 editor.putLong(SF_USER_UID, Long.parseLong(user.id));
                 editor.putString(SF_USER_NAME, user.name);
-                editor.putString(SF_USER_AVATAR, user.avatar_large);
+                editor.putString(SF_USER_AVATAR, user.avatarLarge);
                 editor.putBoolean(AppMainActivity.FIRST_TIME_FLAG, false);
                 editor.apply();
                 startActivity(mtlIntent);
@@ -85,7 +85,7 @@ public class AccountsActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mStatusDao = new StatusDao(this);
+        mStatusDao = new StatusDao();
         setContentView(R.layout.acount_layout);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mWeiboAuth = new WeiboAuth(this, Constants.APP_KEY, Constants.REDIRECT_URL, Constants.SCOPE);
@@ -99,16 +99,17 @@ public class AccountsActivity extends BaseActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                Long uid = Long.decode(mUserList.get(position).id);
-                String userName = mUserList.get(position).name;
-                String userAvartar = mUserList.get(position).avatar_large;
+                WeiboUser user = mUserList.get(position).getUser();
+                Long uid = Long.decode(user.id);
+                String userName = user.name;
+                String userAvatar = user.avatarLarge;
                 Intent mtlIntent = new Intent(AccountsActivity.this,
                         AppMainActivity.class);
                 SharedPreferences sp = getUserPref();
                 Editor editor = sp.edit();
                 editor.putLong(SF_USER_UID, uid);
                 editor.putString(SF_USER_NAME, userName);
-                editor.putString(SF_USER_AVATAR, userAvartar);
+                editor.putString(SF_USER_AVATAR, userAvatar);
                 editor.apply();
                 startActivity(mtlIntent);
             }
@@ -200,11 +201,11 @@ public class AccountsActivity extends BaseActivity {
      * @param user
      * @return
      */
-    public String formatUserCounts(User user) {
-        return getString(R.string.followed) + " " + user.friends_count + "  "
-                + getString(R.string.weibo) + " " + user.statuses_count + "  "
+    public String formatUserCounts(WeiboUser user) {
+        return getString(R.string.followed) + " " + user.friendsCount + "  "
+                + getString(R.string.weibo) + " " + user.statusesCount + "  "
                 + getString(R.string.followMe) + " "
-                + user.followers_count;
+                + user.followersCount;
     }
 
     class AuthListener implements WeiboAuthListener {
@@ -244,6 +245,7 @@ public class AccountsActivity extends BaseActivity {
         @Override
         public View getView(int position, View view, ViewGroup parent) {
             mUser = mUserList.get(position);
+            WeiboUser user = mUser.getUser();
             view.requestLayout();
             if (view == null) {
                 view = View.inflate(AccountsActivity.this, R.layout.user_layout, null);
@@ -255,18 +257,18 @@ public class AccountsActivity extends BaseActivity {
             TextView userCreateAt = (TextView) view
                     .findViewById(R.id.userCreateAt);
             TextView userCounts = (TextView) view.findViewById(R.id.userCounts);
-            userNickName.setText(mUser.screen_name);
-            ImageLoader.getInstance().displayImage(mUser.avatar_large,
+            userNickName.setText(user.screenName);
+            ImageLoader.getInstance().displayImage(user.avatarLarge,
                     userAvatar, UIL_OPTIONS);
             userCreateAt.setText(getString(R.string.createAt)
-                    + OauthUtils.formatCreateAt(mUser.created_at));
-            userCounts.setText(formatUserCounts(mUser));
+                    + OauthUtils.formatCreateAt(user.createdAt));
+            userCounts.setText(formatUserCounts(user));
             return view;
         }
 
         @Override
         public long getItemId(int position) {
-            Long uid = Long.decode(mUserList.get(position).id);
+            Long uid = Long.decode(mUserList.get(position).getUser().id);
             return uid;
         }
 

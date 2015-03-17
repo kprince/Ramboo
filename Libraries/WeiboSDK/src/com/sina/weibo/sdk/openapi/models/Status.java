@@ -31,8 +31,8 @@ import org.json.JSONObject;
  */
 public class Status implements Serializable {
 	
-	
-    
+
+
     /**
 	 * 
 	 */

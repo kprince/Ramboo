@@ -18,6 +18,11 @@ import com.xiaoming.random.utils.OauthUtils;
 
 
 public class RandomApplication extends Application {
+
+    public static  Context getContext() {
+        return context;
+    }
+    private  static Context context;
     public static void initImageLoader(Context context) {
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
                 .threadPriority(Thread.NORM_PRIORITY - 2)
@@ -34,12 +39,12 @@ public class RandomApplication extends Application {
     @SuppressWarnings("unused")
     @Override
     public void onCreate() {
-        if (Constants.DEVELOPER_MODE && Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyDialog().build());
-            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().penaltyDeath().build());
-        }
+//        if (Constants.DEVELOPER_MODE && Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+//            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyDialog().build());
+//            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().penaltyDeath().build());
+//        }
+        context = getBaseContext();
         super.onCreate();
-        L.writeLogs(false);
         initPreferences();
         initImageLoader(getApplicationContext());
     }

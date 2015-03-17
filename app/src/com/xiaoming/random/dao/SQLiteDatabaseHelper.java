@@ -4,10 +4,20 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class UserSQLiteDBHelper extends SQLiteOpenHelper {
+import com.xiaoming.random.RandomApplication;
 
-    public UserSQLiteDBHelper(Context context) {
+public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
+    private static SQLiteDatabaseHelper instance;
+    private SQLiteDatabaseHelper(Context context) {
         super(context, "status_obj.db", null, 1);
+    }
+
+    /*synchronized method to ensure only 1 instance of LocalDBHelper exists*/
+    public static synchronized SQLiteDatabaseHelper getInstance(){
+        if(instance == null){
+            instance = new SQLiteDatabaseHelper(RandomApplication.getContext());
+        }
+        return instance;
     }
 
     @Override
@@ -26,7 +36,7 @@ public class UserSQLiteDBHelper extends SQLiteOpenHelper {
         arg0.execSQL(sql);
         sql = "create table emotions(id number(32),value varchar(32),auth_id number(32),url varchar(256),type varchar(16),category varchar(32),phrase varchar(32))";
         arg0.execSQL(sql);
-//        arg0.close();
+
     }
 
     @Override

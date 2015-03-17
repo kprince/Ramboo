@@ -1,6 +1,8 @@
 package com.xiaoming.random.fragments;
 
 import android.os.Bundle;
+import android.os.Debug;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -17,7 +19,8 @@ import com.xiaoming.random.R;
  * Use the {@link TimeLineFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TimeLineFragment extends Fragment {
+public class TimeLineFragment extends BaseFragment {
+    private static final String TAG="TimeLineFragment";
     private static final String TYPE = "TYPE";
     private PagerSlidingTabStrip mTabs;
     private ViewPager mPager;
@@ -55,7 +58,6 @@ public class TimeLineFragment extends Fragment {
             mType = savedInstanceState.getString(TYPE);
         else
             initArguments();
-
     }
 
     /**
@@ -69,9 +71,10 @@ public class TimeLineFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView;
-        rootView = inflateView(inflater, container);
-        findViews(rootView);
+        if (Constants.DEVELOPER_MODE)
+            Debug.startMethodTracing(TAG);
+        mRootView = inflateView(inflater, container);
+        findViews(mRootView);
         mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -88,8 +91,9 @@ public class TimeLineFragment extends Fragment {
             }
         });
         setUpComponent();
-
-        return rootView;
+        if (Constants.DEVELOPER_MODE)
+            Debug.stopMethodTracing();
+        return mRootView;
     }
 
     /**
@@ -114,6 +118,12 @@ public class TimeLineFragment extends Fragment {
                 break;
         }
         return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
     }
 
     /**
@@ -159,6 +169,11 @@ public class TimeLineFragment extends Fragment {
                         break;
                 }
                 return title;
+            }
+
+            @Override
+            public void destroyItem(ViewGroup container, int position, Object object) {
+//                super.destroyItem(container, position, object);
             }
 
             @Override
