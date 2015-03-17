@@ -29,7 +29,6 @@ import com.xiaoming.random.Constants;
 import com.xiaoming.random.R;
 import com.xiaoming.random.activities.BaseActivity;
 import com.xiaoming.random.activities.UserProfileActivity;
-import com.xiaoming.random.dao.StatusDao;
 import com.xiaoming.random.listener.PauseOnScrollListener;
 import com.xiaoming.random.model.AuthUser;
 import com.xiaoming.random.model.WeiboUser;
