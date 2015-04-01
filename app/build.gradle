@@ -23,9 +23,9 @@ dependencies {
 android {
     signingConfigs {
         config {
-            keyAlias 'xiaoming.keystore'
+            keyAlias 'xiaoming'
             keyPassword 'wenyue123'
-            storeFile file('C:/Users/XM/Desktop/keystore')
+            storeFile file('/Users/wenyueming/Desktop/android/keystore.jks')
             storePassword 'wenyue123'
         }
     }
