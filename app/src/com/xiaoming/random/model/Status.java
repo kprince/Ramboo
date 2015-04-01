@@ -190,7 +190,10 @@ public class Status implements Serializable{
                 int length = jsonArray.length();
                 statuses.statusList = new ArrayList<Status>(length);
                 for (int ix = 0; ix < length; ix++) {
-                    statuses.statusList.add(Status.parse(jsonArray.getJSONObject(ix)));
+                    Status status = Status.parse(jsonArray.getJSONObject(ix));
+                    //过滤广告
+                    if (status.user.following)
+                        statuses.statusList.add(status);
                 }
             }
         } catch (JSONException e) {
