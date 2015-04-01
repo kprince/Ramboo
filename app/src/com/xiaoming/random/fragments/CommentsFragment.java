@@ -26,7 +26,6 @@ import com.xiaoming.random.R;
 import com.xiaoming.random.activities.AccountsActivity;
 import com.xiaoming.random.activities.BaseActivity;
 import com.xiaoming.random.activities.UserProfileActivity;
-import com.xiaoming.random.dao.StatusDao;
 import com.xiaoming.random.listener.PauseOnScrollListener;
 import com.xiaoming.random.model.AuthUser;
 import com.xiaoming.random.model.Comment;
@@ -87,9 +86,9 @@ public class CommentsFragment extends BaseFragment implements SwipeRefreshLayout
     @Override
     public boolean notifyDataSetChanged(Message msg) {
         int what = msg.what;
-        if (what==1&&mCommentsListAdapter!=null)
-            mCommentsListAdapter.notifyDataSetChanged();
-        if (swipeLayout.isRefreshing())swipeLayout.setRefreshing(false);
+        if (what==1&&mCommentsListAdapter!=null)mCommentsListAdapter.notifyDataSetChanged();
+        if (swipeLayout.isRefreshing())setRefreshing(swipeLayout,false);
+//            swipeLayout.setRefreshing(false);
         return true;
     }
     @Override
@@ -196,20 +195,11 @@ public class CommentsFragment extends BaseFragment implements SwipeRefreshLayout
         mCommentsListView.setLayoutManager(mLayoutManager);
         swipeLayout.setOnRefreshListener(this);
         Utils.setSwipeRefreshColorSchema(swipeLayout);
-        setRefreshing(swipeLayout,true);
+        setRefreshing(swipeLayout, true);
         newGetCacheTask();
         if (Constants.DEVELOPER_MODE)
             Debug.stopMethodTracing();
         return mRootView;
-    }
-
-
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-//        getCachedComments();
     }
 
     @Override

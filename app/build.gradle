@@ -14,22 +14,27 @@ dependencies {
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'de.hdodenhof:circleimageview:1.2.1'
     compile 'com.github.navasmdc:MaterialDesign:1.+@aar'
-//    compile 'com.github.ksoichiro:android-observablescrollview:1.5.0'
+    //    compile 'com.github.ksoichiro:android-observablescrollview:1.5.0'
     compile 'com.nineoldandroids:library:2.4.+'
     compile 'com.belerweb:pinyin4j:2.5.0'
     compile 'com.balysv:material-ripple:1.0.1'
-
 }
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'xiaoming.keystore'
+            keyPassword 'wenyue123'
+            storeFile file('C:/Users/XM/Desktop/keystore')
+            storePassword 'wenyue123'
+        }
+    }
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
-
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -52,5 +57,10 @@ android {
         // by a similar customization.
         debug.setRoot('build-types/debug')
         release.setRoot('build-types/release')
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.config
+        }
     }
 }

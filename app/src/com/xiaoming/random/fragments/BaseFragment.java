@@ -7,13 +7,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.xiaoming.random.R;
 import com.xiaoming.random.activities.BaseActivity;
@@ -134,17 +131,28 @@ public class BaseFragment extends Fragment {
     }
 
     public void setRefreshing(final SwipeRefreshLayout swipeRefreshLayout, final boolean tf) {
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                swipeRefreshLayout.setRefreshing(tf);
-            }
-        }, 100);
+        if (!tf) {
+            swipeRefreshLayout.setRefreshing(tf);
+            return;
+        }
+        swipeRefreshLayout.setProgressViewOffset(false, 0,
+                (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
+        swipeRefreshLayout.setRefreshing(true);
+//        TypedValue typed_value = new TypedValue();
+//        getActivity().getTheme().resolveAttribute(android.support.v7.appcompat.R.attr.actionBarSize, typed_value, true);
+//        swipeRefreshLayout.setProgressViewOffset(false, 0, getResources().getDimensionPixelSize(typed_value.resourceId));
+//        swipeRefreshLayout.setRefreshing(true);
+//        mHandler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                swipeRefreshLayout.setRefreshing(tf);
+//            }
+//        }, 200);
     }
 
 
     /**
-     * 获取Material Design 的颜色
+     * 获取Material主题的颜色colorPrimary/colorPrimaryDark/colorAccent
      *
      * @param attr Material Design Color attr like R.attr.colorPrimary
      * @return

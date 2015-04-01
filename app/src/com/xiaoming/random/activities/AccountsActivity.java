@@ -246,7 +246,6 @@ public class AccountsActivity extends BaseActivity {
         public View getView(int position, View view, ViewGroup parent) {
             mUser = mUserList.get(position);
             WeiboUser user = mUser.getUser();
-            view.requestLayout();
             if (view == null) {
                 view = View.inflate(AccountsActivity.this, R.layout.user_layout, null);
             }

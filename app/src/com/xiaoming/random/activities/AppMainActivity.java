@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Debug;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -368,6 +367,7 @@ public class AppMainActivity extends BaseActivity {
                 mLogoutDialog.show();
                 ButtonFlat accept = mLogoutDialog.getButtonAccept();
                 accept.setText(getString(R.string.accept));
+                accept.setBackgroundColor(getColor(R.attr.colorPrimary));
                 mLogoutDialog.setOnAcceptButtonClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

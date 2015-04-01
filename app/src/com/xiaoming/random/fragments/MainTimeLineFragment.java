@@ -7,10 +7,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Debug;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,7 +30,6 @@ import com.sina.weibo.sdk.utils.LogUtil;
 import com.xiaoming.random.Constants;
 import com.xiaoming.random.R;
 import com.xiaoming.random.activities.AccountsActivity;
-import com.xiaoming.random.dao.StatusDao;
 import com.xiaoming.random.listener.PauseOnScrollListener;
 import com.xiaoming.random.model.AuthUser;
 import com.xiaoming.random.model.Favorite;
@@ -105,7 +101,9 @@ public class MainTimeLineFragment extends BaseFragment implements
         int what = msg.what;
         if (what==1&&mStatusAdapter!=null)
             mStatusAdapter.notifyDataSetChanged();
-        if (swipeLayout.isRefreshing())swipeLayout.setRefreshing(false);
+        if (swipeLayout.isRefreshing())
+            setRefreshing(swipeLayout,false);
+//            swipeLayout.setRefreshing(false);
         return true;
     }
 
@@ -212,7 +210,8 @@ public class MainTimeLineFragment extends BaseFragment implements
             }
         } else {
             if (swipeLayout != null) {
-                swipeLayout.setRefreshing(false);
+//                swipeLayout.setRefreshing(false);
+                setRefreshing(swipeLayout,false);
             }
             OauthUtils.showToast(getActivity(), getString(R.string.networkUnavailable));
 
